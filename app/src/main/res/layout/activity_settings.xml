@@ -1,125 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:layout_marginStart="16dp"
     android:layout_marginEnd="12dp"
-    android:layout_marginStart="16dp">
+    android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp">
 
         <ImageView
             android:id="@+id/button_back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/transparent"
+            android:scaleType="centerCrop"
             android:src="@drawable/ic_arrow_back"
-            app:iconTint="@color/black"
-            android:scaleType="centerCrop"/>
+            app:iconTint="@color/settings_screen_text_color" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/settings_text_margin_vertical"
             android:text="@string/settings"
-            android:textColor="@color/black"
-            android:textSize="@dimen/header_text_size"
-            android:layout_marginVertical="@dimen/settings_text_margin_vertical"/>
+            android:textColor="@color/settings_screen_text_color"
+            android:fontFamily="@font/ys_display_medium"
+            android:textSize="@dimen/header_text_size" />
 
-        </LinearLayout>
-        
-        <FrameLayout
-            android:layout_width="match_parent"
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:foreground="?attr/selectableItemBackground">
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="11dp"
-            android:foreground="?attr/selectableItemBackground">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/night_theme"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/primary_text_size"
-                    android:layout_marginVertical="@dimen/settings_text_margin_vertical"/>
+            android:layout_marginVertical="@dimen/settings_text_margin_vertical"
+            android:text="@string/night_theme"
+            android:textColor="@color/settings_screen_text_color"
+            android:fontFamily="@font/ys_display_regular"
+            android:textSize="@dimen/primary_text_size" />
 
-                <Switch
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|end"
-                    android:foregroundGravity="right"
-                    android:gravity="end"
-                    android:thumbTint="@color/thumb_tint"
-                    android:trackTint="@color/track_tint" />
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
+        <Switch
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="11dp"
-            android:foreground="?attr/selectableItemBackground">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/share"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/primary_text_size"
-                    android:layout_marginVertical="@dimen/settings_text_margin_vertical"/>
+            android:layout_gravity="center_vertical|end"
+            android:foregroundGravity="right"
+            android:gravity="end"
+            android:thumbTint="@color/thumb_tint"
+            android:trackTint="@color/track_tint" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_share"
-                    android:layout_gravity="center_vertical|end"
-                    android:backgroundTint="@color/icon_tint_light"/>
+    </FrameLayout>
 
-        </FrameLayout>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="11dp"
-            android:foreground="?attr/selectableItemBackground">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/support"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/primary_text_size"
-                    android:layout_marginVertical="@dimen/settings_text_margin_vertical"
-                    android:backgroundTint="@color/icon_tint_light"/>
+    <TextView
+        style="@style/SettingsScreenButton"
+        android:drawableEnd="@drawable/ic_share"
+        android:text="@string/share" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_support"
-                    android:layout_gravity="center_vertical|end"/>
+    <TextView
+        style="@style/SettingsScreenButton"
+        android:drawableEnd="@drawable/ic_support"
+        android:text="@string/support" />
 
-        </FrameLayout>
+    <TextView
+        style="@style/SettingsScreenButton"
+        android:drawableEnd="@drawable/ic_arrow_forward"
+        android:text="@string/terms_of_use" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="11dp"
-            android:foreground="?attr/selectableItemBackground">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/terms_of_use"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/primary_text_size"
-                    android:layout_marginVertical="@dimen/settings_text_margin_vertical"
-                    android:backgroundTint="@color/icon_tint_light"/>
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_arrow_forward"
-                    android:layout_gravity="center_vertical|end" />
-
-        </FrameLayout>
 
 </LinearLayout>
