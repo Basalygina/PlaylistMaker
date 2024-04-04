@@ -11,5 +11,10 @@
     <color name="thumb_tint">#E6E8EB</color>
     <color name="track_tint">#AEAFB4</color>
     <color name="icon_tint">#AEAFB4</color>
+    <color name="search_screen_header_color">@color/color_black</color>
+    <color name="search_tint">#E6E8EB</color>
+    <color name="search_icon_tint">#AEAFB4</color>
+    <color name="search_screen_text_color">@color/color_black</color>
+
 
 </resources>
