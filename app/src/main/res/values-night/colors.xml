@@ -2,6 +2,7 @@
 <resources>
     <color name="color_white">#FFFFFF</color>
     <color name="color_black">#1A1B22</color>
+    <color name="color_grey">#AEAFB4</color>
     <color name="main_screen_button_text_color">@color/color_black</color>
     <color name="settings_screen_text_color">@color/color_white</color>
     <color name="settings_screen_icon_tint">@color/color_white</color>
@@ -15,5 +16,7 @@
     <color name="search_tint">@color/color_white</color>
     <color name="search_icon_tint">@color/color_black</color>
     <color name="search_screen_text_color">@color/color_black</color>
+    <color name="search_track_title">@color/color_white</color>
+    <color name="search_track_attributes">@color/color_white</color>
 
 </resources>

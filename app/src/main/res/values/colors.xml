@@ -2,19 +2,21 @@
 <resources>
     <color name="color_white">#FFFFFF</color>
     <color name="color_black">#1A1B22</color>
+    <color name="color_grey">#AEAFB4</color>
     <color name="main_screen_button_text_color">@color/color_black</color>
     <color name="settings_screen_text_color">@color/color_black</color>
-    <color name="settings_screen_icon_tint">#AEAFB4</color>
+    <color name="settings_screen_icon_tint">@color/color_grey</color>
     <color name="primary_background_color">#FFFFFFFF</color>
     <color name="main_screen_background">#3772E7</color>
     <color name="transparent">#00ffffff</color>
     <color name="thumb_tint">#E6E8EB</color>
-    <color name="track_tint">#AEAFB4</color>
-    <color name="icon_tint">#AEAFB4</color>
+    <color name="track_tint">@color/color_grey</color>
+    <color name="icon_tint">@color/color_grey</color>
     <color name="search_screen_header_color">@color/color_black</color>
     <color name="search_tint">#E6E8EB</color>
-    <color name="search_icon_tint">#AEAFB4</color>
+    <color name="search_icon_tint">@color/color_grey</color>
     <color name="search_screen_text_color">@color/color_black</color>
-
+    <color name="search_track_title">#000000</color>
+    <color name="search_track_attributes">@color/color_grey</color>
 
 </resources>
