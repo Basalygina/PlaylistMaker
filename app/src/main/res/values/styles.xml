@@ -6,7 +6,7 @@
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_marginBottom">@dimen/buttons_margin</item>
         <item name="android:layout_weight">1</item>
-        <item name="backgroundTint">@color/primary_background_color</item>
+        <item name="backgroundTint">@color/color_white</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">@color/main_screen_button_text_color</item>
         <item name="android:textSize">@dimen/header_text_size</item>
