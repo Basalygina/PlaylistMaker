@@ -6,19 +6,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="16dp"
+        android:layout_marginHorizontal="@dimen/margin_horizontal"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/extra_small_padding">
 
             <ImageView
                 android:id="@+id/button_back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:paddingEnd="12dp"
+                android:paddingEnd="@dimen/margin_horizontal"
                 android:src="@drawable/ic_arrow_back_small" />
 
             <TextView
@@ -26,7 +27,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/settings_text_margin_vertical"
                 android:fontFamily="@font/ys_display_medium"
-                android:paddingStart="12dp"
+                android:paddingStart="@dimen/margin_horizontal"
                 android:text="@string/search"
                 android:textColor="@color/settings_screen_text_color"
                 android:textSize="@dimen/header_text_size" />
@@ -37,7 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_background"
-            android:paddingVertical="10dp">
+            android:paddingVertical="10dp"
+            android:layout_marginHorizontal="@dimen/extra_small_padding">
 
 
             <EditText
@@ -46,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:drawableStart="@drawable/ic_search_small"
-                android:drawablePadding="8dp"
+                android:drawablePadding="@dimen/icon_padding"
                 android:fontFamily="@font/ys_display_regular"
                 android:hint="@string/search"
                 android:imeOptions="actionDone"
@@ -104,6 +106,7 @@
             android:paddingHorizontal="@dimen/margin_vertical"
             android:text="@string/error_connection"
             android:textSize="19sp"
+            android:textColor="@color/search_icon_tint_reverse"
             android:visibility="invisible" />
 
         <TextView
@@ -116,10 +119,12 @@
             android:clickable="true"
             android:gravity="center"
             android:paddingVertical="@dimen/small_padding"
-            android:paddingStart="8dp"
+            android:paddingStart="@dimen/buttons_margin"
             android:paddingEnd="@dimen/small_padding"
             android:text="@string/refresh"
             android:textColor="@color/primary_background_color"
+            android:fontFamily="@font/ys_display_medium"
+            android:textFontWeight="500"
             android:textSize="14sp"
             android:visibility="invisible" />
 

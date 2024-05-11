@@ -34,7 +34,7 @@ class SearchActivity : AppCompatActivity() {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     private val iTunesService = retrofit.create(iTunesSearchApi::class.java)
-    private val tracks = ArrayList<Track>()
+    private val tracks = mutableListOf<Track>()
     private lateinit var recycler: RecyclerView
     private var adapter = TrackAdapter(tracks)
 
@@ -127,28 +127,33 @@ class SearchActivity : AppCompatActivity() {
                 call: Call<SearchResponse>,
                 response: Response<SearchResponse>
             ) {
-                when (response.code()) {
-                    200 -> {
-                        Log.d(Companion.TAG, "Response code: ${response.code()}")
-                        if (response.body()?.results?.isNotEmpty() == true) {
-                            hideError()
-                            tracks.clear()
-                            tracks.addAll(response.body()?.results!!)
-                            adapter.notifyDataSetChanged()
-                        } else {
-                            showError(
-                                ERROR_NOTHING_FOUND,
-                                R.drawable.error_nothing_found,
-                                R.string.error_nothing_found
-                            )
-                            tracks.clear()
-                            adapter.notifyDataSetChanged()
-                        }
-
+                val results = response.body()?.results
+                if (response.isSuccessful) {
+                    Log.d(Companion.TAG, "Response code: ${response.code()}")
+                    if (results != null) {
+                        hideError()
+                        tracks.clear()
+                        tracks.addAll(results)
+                        adapter.notifyDataSetChanged()
+                    } else {
+                        showError(
+                            ERROR_NOTHING_FOUND,
+                            R.drawable.error_nothing_found,
+                            R.string.error_nothing_found
+                        )
+                        tracks.clear()
+                        adapter.notifyDataSetChanged()
                     }
-
-                    else -> onFailure(call, Throwable("Response code ${response.code()}"))
+                } else {
+                    showError(
+                        ERROR_CONNECTION,
+                        R.drawable.error_connection,
+                        R.string.error_connection
+                    )
+                    tracks.clear()
+                    adapter.notifyDataSetChanged()
                 }
+
             }
 
             override fun onFailure(call: Call<SearchResponse>, t: Throwable) {
