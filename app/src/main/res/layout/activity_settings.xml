@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginStart="16dp"
@@ -45,7 +46,7 @@
             android:fontFamily="@font/ys_display_regular"
             android:textSize="@dimen/primary_text_size" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <Switch
             android:id="@+id/themeSwitcher"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,7 +55,9 @@
             android:gravity="end"
             android:thumbTint="@color/thumb_tint"
             android:trackTint="@color/track_tint"
-            app:thumbTintMode="src_in" />
+            android:thumbTintMode="src_atop"
+            android:trackTintMode="src_atop"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
     </FrameLayout>
 
