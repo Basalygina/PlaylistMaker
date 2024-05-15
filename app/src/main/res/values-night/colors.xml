@@ -18,5 +18,6 @@
     <color name="search_screen_text_color">@color/color_black</color>
     <color name="search_track_title">@color/color_white</color>
     <color name="search_track_attributes">@color/color_white</color>
+    <color name="search_icon_tint_reverse">@color/color_white</color>
 
 </resources>
