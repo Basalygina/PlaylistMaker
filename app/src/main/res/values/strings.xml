@@ -21,6 +21,7 @@
     <string name="refresh">Обновить</string>
     <string name="search_history">Вы искали</string>
     <string name="clear_history">Очистить историю</string>
+    <string name="view_track_message">Просмотр трека &quot;%1$s&quot; из истории</string>
 
 
 </resources>

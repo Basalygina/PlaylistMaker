@@ -23,7 +23,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class SearchActivity : AppCompatActivity() {
-    var searchText: String? = null
+    private var searchText: String? = null
     private val baseUrl = "https://itunes.apple.com"
     private val retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
@@ -36,7 +36,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var recyclerSearch: RecyclerView
     private lateinit var recyclerSearchHistory: RecyclerView
     private lateinit var searchHistory: SearchHistory
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,9 +66,10 @@ class SearchActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         }
         adapterSearchHistory = TrackAdapter(searchHistory.searchHistoryList) {
+            val message = getString(R.string.view_track_message, it.trackName)
             Toast.makeText(
                 applicationContext,
-                "Просмотр трека \"${it.trackName}\" из истории",
+                message,
                 Toast.LENGTH_SHORT
             ).show()
         }

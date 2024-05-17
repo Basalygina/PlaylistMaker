@@ -11,22 +11,18 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("PMtest", "Стартуем приложение")
         val sharedPref = getSharedPreferences(PM_PREFERENCES, MODE_PRIVATE)
         if (sharedPref.contains(NIGHT_MODE_KEY)) {
             darkTheme = sharedPref.getBoolean(NIGHT_MODE_KEY, false)
             switchTheme(darkTheme)
-            Log.d("PMtest", "есть преференс, темная тема  ${darkTheme}")
         } else {
             val uiModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
             AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
             darkTheme = uiModeFlags == Configuration.UI_MODE_NIGHT_YES
-            Log.d("PMtest", "нет преференс, темная тема ${darkTheme}")
         }
     }
 
     fun switchTheme(darkThemeEnabled: Boolean) {
-        Log.d(SearchActivity.TAG, "Меняем тему!!")
         val sharedPref = getSharedPreferences(PM_PREFERENCES, MODE_PRIVATE)
         darkTheme = darkThemeEnabled
         AppCompatDelegate.setDefaultNightMode(

@@ -47,7 +47,7 @@
             android:textSize="@dimen/primary_text_size" />
 
         <Switch
-            android:id="@+id/themeSwitcher"
+            android:id="@+id/theme_switcher"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"

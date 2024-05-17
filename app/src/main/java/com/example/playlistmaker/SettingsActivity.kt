@@ -10,7 +10,6 @@ import android.widget.Switch
 
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +18,7 @@ class SettingsActivity : AppCompatActivity() {
 
         val app = application as App
         Log.d("PMtest", "Экран настроек, темная тема ${app.darkTheme}")
-        val themeSwitcher = findViewById<Switch>(R.id.themeSwitcher)
+        val themeSwitcher = findViewById<Switch>(R.id.theme_switcher)
         themeSwitcher.isChecked = app.darkTheme
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
             app.switchTheme(checked)

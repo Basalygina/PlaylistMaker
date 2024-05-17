@@ -12,9 +12,7 @@ data class Track(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Track
-
-        if (trackId != other.trackId) return false
+        if (trackId != (other as Track).trackId) return false
 
         return true
     }
