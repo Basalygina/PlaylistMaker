@@ -10,7 +10,7 @@ import com.bumptech.glide.request.RequestOptions
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
     private val trackNameView: TextView
     private val artistNameView: TextView
     private val trackTimeView: TextView
