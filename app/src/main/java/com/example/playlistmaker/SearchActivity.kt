@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -12,24 +13,33 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.concurrent.TimeUnit
 
 class SearchActivity : AppCompatActivity() {
     private var searchText: String? = null
     private val baseUrl = "https://itunes.apple.com"
+    val okHttpClient = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .build()
     private val retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
+        .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     private val iTunesService = retrofit.create(iTunesSearchApi::class.java)
+    private val gson = Gson()
     private val tracks = mutableListOf<Track>()
     private lateinit var adapter: TrackAdapter
     private lateinit var adapterSearchHistory: TrackAdapter
@@ -40,6 +50,7 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
         val searchEditText = findViewById<EditText>(R.id.search_edit_text)
         val clearButton = findViewById<ImageView>(R.id.clear_button)
         val buttonBack = findViewById<ImageView>(R.id.button_back)
@@ -66,16 +77,15 @@ class SearchActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         }
         adapterSearchHistory = TrackAdapter(searchHistory.searchHistoryList) {
-            val message = getString(R.string.view_track_message, it.trackName)
-            Toast.makeText(
-                applicationContext,
-                message,
-                Toast.LENGTH_SHORT
-            ).show()
+            searchHistory.addToSearchHistory(it)
+            adapterSearchHistory.notifyDataSetChanged()
+            startPlayerActivity(it)
         }
         adapter = TrackAdapter(tracks) {
             searchHistory.addToSearchHistory(it)
             adapterSearchHistory.notifyDataSetChanged()
+            startPlayerActivity(it)
+
         }
 
         searchEditText.setText(searchText)
@@ -139,6 +149,13 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
+    private fun startPlayerActivity(track: Track) {
+        val intent = Intent(this@SearchActivity, PlayerActivity::class.java)
+        val trackJson = gson.toJson(track)
+        intent.putExtra("TRACK_DATA", trackJson)
+        startActivity(intent)
+    }
+
     private fun showError(errorType: String, imageResource: Int, errorMessageResource: Int) {
         val errorImage = findViewById<ImageView>(R.id.error_image)
         val errorText = findViewById<TextView>(R.id.error_text)
@@ -170,12 +187,14 @@ class SearchActivity : AppCompatActivity() {
                 val results = response.body()?.results
                 if (response.isSuccessful) {
                     Log.d(TAG, "Response code: ${response.code()}")
-                    if (results != null) {
+                    if (results?.isNotEmpty() == true) {
+                        Log.d(TAG, "results: ${results}")
                         hideError()
                         tracks.clear()
                         tracks.addAll(results)
                         adapter.notifyDataSetChanged()
                     } else {
+                        Log.d(TAG, "ERROR_NOTHING_FOUND")
                         showError(
                             ERROR_NOTHING_FOUND,
                             R.drawable.error_nothing_found,
@@ -185,6 +204,7 @@ class SearchActivity : AppCompatActivity() {
                         adapter.notifyDataSetChanged()
                     }
                 } else {
+                    Log.d(TAG, "Ошибка соединения: ${response.code()} - ${response.message()}")
                     showError(
                         ERROR_CONNECTION,
                         R.drawable.error_connection,
@@ -197,6 +217,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<SearchResponse>, t: Throwable) {
+                Log.e(TAG, "Ошибка: ${t.message}", t)
                 showError(ERROR_CONNECTION, R.drawable.error_connection, R.string.error_connection)
                 tracks.clear()
             }
