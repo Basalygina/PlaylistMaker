@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlistmaker.Track.Companion.TRACK_DATA
 import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -39,9 +41,7 @@ class PlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
-        Log.d(SearchActivity.TAG, "onCreate")
-        val trackJson = intent.getStringExtra("TRACK_DATA")
-        val track = gson.fromJson(trackJson, Track::class.java)
+        val track = intent.getSerializableExtra(TRACK_DATA) as Track
         val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
         val constraintLayout = findViewById<ConstraintLayout>(R.id.player_layout)
         val constraintSet = ConstraintSet()
@@ -75,9 +75,10 @@ class PlayerActivity : AppCompatActivity() {
         country.text = track.country
 
         Glide.with(applicationContext)
-            .load(track.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"))
+            .load(track.artworkUrl512)
             .placeholder(R.drawable.placeholder_large)
             .centerCrop()
+            .transform(RoundedCorners(4))
             .into(albumCover)
 
         if (track.collectionName.isEmpty()) {
@@ -94,5 +95,6 @@ class PlayerActivity : AppCompatActivity() {
 
 
     }
+
 
 }

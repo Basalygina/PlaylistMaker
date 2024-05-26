@@ -16,6 +16,7 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.Track.Companion.TRACK_DATA
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -151,8 +152,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun startPlayerActivity(track: Track) {
         val intent = Intent(this@SearchActivity, PlayerActivity::class.java)
-        val trackJson = gson.toJson(track)
-        intent.putExtra("TRACK_DATA", trackJson)
+        intent.putExtra(TRACK_DATA, track)
         startActivity(intent)
     }
 
@@ -188,13 +188,11 @@ class SearchActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     Log.d(TAG, "Response code: ${response.code()}")
                     if (results?.isNotEmpty() == true) {
-                        Log.d(TAG, "results: ${results}")
                         hideError()
                         tracks.clear()
                         tracks.addAll(results)
                         adapter.notifyDataSetChanged()
                     } else {
-                        Log.d(TAG, "ERROR_NOTHING_FOUND")
                         showError(
                             ERROR_NOTHING_FOUND,
                             R.drawable.error_nothing_found,
