@@ -22,6 +22,11 @@
     <string name="search_history">Вы искали</string>
     <string name="clear_history">Очистить историю</string>
     <string name="view_track_message">Просмотр трека &quot;%1$s&quot; из истории</string>
+    <string name="track_time_label">Длительность</string>
+    <string name="album_label">Альбом</string>
+    <string name="year_label">Год</string>
+    <string name="genre_label">Жанр</string>
+    <string name="country_label">Страна</string>
 
 
 </resources>
