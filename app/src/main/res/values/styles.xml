@@ -59,5 +59,11 @@
         <item name="layout_constraintEnd_toEndOf">@id/end_secondary_guideLine</item>
 
     </style>
+    
+    <style name="ToolbarTextStyle">
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textSize">@dimen/header_text_size</item>
+        <item name="android:textColor">@color/settings_screen_text_color</item>
+</style>
 
 </resources>

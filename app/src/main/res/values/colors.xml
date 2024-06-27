@@ -2,6 +2,7 @@
 <resources>
     <color name="color_white">#FFFFFF</color>
     <color name="color_black">#1A1B22</color>
+    <color name="color_red">#FF0000</color>
     <color name="color_grey">#AEAFB4</color>
     <color name="main_screen_button_text_color">@color/color_black</color>
     <color name="settings_screen_text_color">@color/color_black</color>
@@ -19,6 +20,7 @@
     <color name="search_track_title">#000000</color>
     <color name="search_track_attributes">@color/color_grey</color>
     <color name="search_icon_tint_reverse">@color/color_black</color>
-    <color name="progress_bar_tint">#6200EE</color>
+    <color name="progress_bar_tint">#5965e1</color>
+
 
 </resources>

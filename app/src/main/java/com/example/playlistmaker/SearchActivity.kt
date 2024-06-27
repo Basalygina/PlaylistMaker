@@ -16,6 +16,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -68,7 +69,7 @@ class SearchActivity : AppCompatActivity() {
 
         val searchEditText = findViewById<EditText>(R.id.search_edit_text)
         val clearButton = findViewById<ImageView>(R.id.clear_button)
-        val buttonBack = findViewById<ImageView>(R.id.button_back)
+        val searchToolbar = findViewById<Toolbar>(R.id.search_toolbar)
         val refreshButton = findViewById<TextView>(R.id.refresh_button)
         val searchHistoryLabel = findViewById<TextView>(R.id.search_history_label)
         val clearHistoryButton = findViewById<TextView>(R.id.clear_history_button)
@@ -131,7 +132,7 @@ class SearchActivity : AppCompatActivity() {
             clearButton.visibility = View.GONE
         }
 
-        buttonBack.setOnClickListener {
+        searchToolbar.setNavigationOnClickListener{
             onBackPressed()
         }
 
