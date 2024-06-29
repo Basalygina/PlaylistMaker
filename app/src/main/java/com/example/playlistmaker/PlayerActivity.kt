@@ -1,9 +1,9 @@
 package com.example.playlistmaker
 
+import android.media.MediaPlayer
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
-import android.view.View
+import android.os.Handler
+import android.os.Looper
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +18,10 @@ import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
     private val gson = Gson()
+    private val handler = Handler(Looper.getMainLooper())
+    private val mediaPlayer = MediaPlayer()
+    private var playerState = STATE_DEFAULT
+
     private lateinit var buttonBack: ImageView
     private lateinit var playButton: ImageView
     private lateinit var queueButton: ImageView
@@ -31,6 +35,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var releaseDate: TextView
     private lateinit var primaryGenreName: TextView
     private lateinit var country: TextView
+    private lateinit var playedTime: TextView
 
     private lateinit var trackTimeLabel: TextView
     private lateinit var collectionNameLabel: TextView
@@ -59,12 +64,15 @@ class PlayerActivity : AppCompatActivity() {
         releaseDate = findViewById(R.id.year_data)
         primaryGenreName = findViewById(R.id.genre_data)
         country = findViewById(R.id.country_data)
+        playedTime = findViewById(R.id.played_time)
 
         trackTimeLabel = findViewById(R.id.track_time_label)
         collectionNameLabel = findViewById(R.id.collection_label)
         releaseDateLabel = findViewById(R.id.year_label)
         primaryGenreNameLabel = findViewById(R.id.genre_label)
         countryLabel = findViewById(R.id.country_label)
+
+        preparePlayer(track)
 
         trackName.text = track.trackName
         artistName.text = track.artistName
@@ -78,14 +86,29 @@ class PlayerActivity : AppCompatActivity() {
             .load(track.artworkUrl512)
             .placeholder(R.drawable.placeholder_large)
             .centerCrop()
-            .transform(RoundedCorners(4))
+            .transform(RoundedCorners(8))
             .into(albumCover)
 
         if (track.collectionName.isEmpty()) {
             collectionNameLabel.text = ""
-            constraintSet.connect(R.id.year_label,ConstraintSet.TOP,R.id.h_guideLine_8,ConstraintSet.BOTTOM)
-            constraintSet.connect(R.id.genre_label,ConstraintSet.TOP,R.id.h_guideLine_9,ConstraintSet.BOTTOM)
-            constraintSet.connect(R.id.country_label, ConstraintSet.TOP, R.id.h_guideLine_10, ConstraintSet.BOTTOM)
+            constraintSet.connect(
+                R.id.year_label,
+                ConstraintSet.TOP,
+                R.id.h_guideLine_8,
+                ConstraintSet.BOTTOM
+            )
+            constraintSet.connect(
+                R.id.genre_label,
+                ConstraintSet.TOP,
+                R.id.h_guideLine_9,
+                ConstraintSet.BOTTOM
+            )
+            constraintSet.connect(
+                R.id.country_label,
+                ConstraintSet.TOP,
+                R.id.h_guideLine_10,
+                ConstraintSet.BOTTOM
+            )
             constraintSet.applyTo(constraintLayout)
         }
 
@@ -93,7 +116,79 @@ class PlayerActivity : AppCompatActivity() {
             onBackPressed()
         }
 
+        playButton.setOnClickListener {
+            when (playerState) {
+                STATE_PLAYING -> {
+                    pausePlayer()
+                }
 
+                STATE_PREPARED, STATE_PAUSED -> {
+                    startPlayer()
+                }
+            }
+        }
+
+
+    }
+
+    private fun startPlayer() {
+        mediaPlayer.start()
+        playerState = STATE_PLAYING
+        handler.post(updatePlayedTime())
+
+        playButton.setImageResource(R.drawable.ic_pause)
+    }
+
+    private fun updatePlayedTime(): Runnable {
+        return object : Runnable {
+            override fun run() {
+                if (playerState == STATE_PLAYING) {
+                    playedTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(
+                        mediaPlayer.currentPosition
+                    )
+                    handler.postDelayed(this, TIMER_STEP / 2)
+                }
+            }
+        }
+    }
+
+    private fun pausePlayer() {
+        mediaPlayer.pause()
+        playerState = STATE_PAUSED
+        handler.removeCallbacks(updatePlayedTime())
+        playButton.setImageResource(R.drawable.ic_play)
+
+    }
+
+    private fun preparePlayer(track: Track) {
+        mediaPlayer.setDataSource(track.previewUrl)
+        mediaPlayer.prepareAsync()
+        mediaPlayer.setOnPreparedListener {
+            playerState = STATE_PREPARED
+        }
+        mediaPlayer.setOnCompletionListener {
+            playerState = STATE_PREPARED
+            playedTime.setText(R.string.timer_start_time)
+            playButton.setImageResource(R.drawable.ic_play)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
+    }
+
+    companion object {
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
+        private const val TIMER_STEP = 1_000L
     }
 
 

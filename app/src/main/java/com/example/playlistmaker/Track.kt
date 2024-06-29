@@ -11,7 +11,8 @@ data class Track(
     val collectionName: String, // Альбом
     val releaseDate: String, // Год релиза
     val primaryGenreName: String, // Жанр
-    val country: String // Страна исполнителя
+    val country: String, // Страна исполнителя
+    val previewUrl: String // Отрывок трека
 ) : Serializable {
     val artworkUrl512
         get() = artworkUrl100.replaceAfterLast('/', "512x512bb.jpg")

@@ -68,7 +68,7 @@
                     android:ellipsize="end"
                     android:fontFamily="@font/ys_display_regular"
                     android:maxLines="1"
-                    android:text="@string/duration"
+                    android:text="@string/timer_start_time"
                     android:textColor="@color/search_track_attributes"
                     android:textSize="@dimen/small_text_size" />
             </LinearLayout>

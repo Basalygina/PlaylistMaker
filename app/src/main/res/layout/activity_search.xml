@@ -11,35 +11,22 @@
         android:layout_marginHorizontal="@dimen/margin_horizontal"
         android:orientation="vertical">
 
-        <LinearLayout
+        <Toolbar
+            android:id="@+id/search_toolbar"
+            style="@style/ToolbarTextStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/extra_small_padding">
-
-            <ImageView
-                android:id="@+id/button_back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:paddingEnd="@dimen/margin_horizontal"
-                android:src="@drawable/ic_arrow_back_small" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="@dimen/settings_text_margin_vertical"
-                android:fontFamily="@font/ys_display_medium"
-                android:paddingStart="@dimen/margin_horizontal"
-                android:text="@string/search"
-                android:textColor="@color/settings_screen_text_color"
-                android:textSize="@dimen/header_text_size" />
-
-        </LinearLayout>
+            android:clickable="true"
+            android:paddingStart="-8dp"
+            android:contentInsetStartWithNavigation="0dp"
+            android:navigationIcon="@drawable/ic_arrow_back_small"
+            android:title="@string/search" />
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/extra_small_padding"
+            android:layout_marginTop="8dp"
             android:background="@drawable/rounded_background"
             android:paddingVertical="10dp">
 
@@ -53,7 +40,6 @@
                 android:drawablePadding="@dimen/icon_padding"
                 android:fontFamily="@font/ys_display_regular"
                 android:hint="@string/search"
-                android:imeOptions="actionDone"
                 android:inputType="text"
                 android:paddingStart="@dimen/margin_horizontal"
                 android:singleLine="true"
@@ -130,6 +116,7 @@
             android:textSize="14sp"
             android:visibility="invisible" />
 
+
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -192,6 +179,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/search_history_list"
             app:layout_constraintVertical_chainStyle="packed" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="98dp"
+            android:indeterminateTint="@color/progress_bar_tint"
+            android:visibility="gone"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
 </FrameLayout>
