@@ -8,29 +8,16 @@
     android:layout_marginEnd="12dp"
     android:orientation="vertical">
 
-    <LinearLayout
+    <Toolbar
+        android:id="@+id/settings_toolbar"
+        style="@style/ToolbarTextStyle"
+        android:layout_marginBottom="@dimen/margin_vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp">
-
-        <ImageView
-            android:id="@+id/button_back"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_arrow_back"
-            app:iconTint="@color/settings_screen_text_color" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/settings_text_margin_vertical"
-            android:text="@string/settings"
-            android:textColor="@color/settings_screen_text_color"
-            android:fontFamily="@font/ys_display_medium"
-            android:textSize="@dimen/header_text_size" />
-
-    </LinearLayout>
+        android:clickable="true"
+        android:contentInsetStartWithNavigation="0dp"
+        android:navigationIcon="@drawable/ic_arrow_back_small"
+        android:title="@string/settings" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -50,7 +37,7 @@
             android:id="@+id/theme_switcher"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
+            android:layout_gravity="center|end"
             android:foregroundGravity="right"
             android:gravity="end"
             android:thumbTint="@color/thumb_tint"

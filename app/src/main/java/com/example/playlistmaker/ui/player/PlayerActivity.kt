@@ -1,28 +1,30 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.player
 
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.playlistmaker.Track.Companion.TRACK_DATA
-import com.google.gson.Gson
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.example.playlistmaker.Creator
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.api.interactors.PlayerInteractor
+import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.domain.models.Track.Companion.TRACK_DATA
+import com.example.playlistmaker.ui.search.SearchActivity.Companion.TAG
 
 class PlayerActivity : AppCompatActivity() {
-    private val gson = Gson()
     private val handler = Handler(Looper.getMainLooper())
-    private val mediaPlayer = MediaPlayer()
     private var playerState = STATE_DEFAULT
+    private lateinit var playerInteractor: PlayerInteractor
 
-    private lateinit var buttonBack: ImageView
+    private lateinit var playerToolbar: Toolbar
     private lateinit var playButton: ImageView
     private lateinit var queueButton: ImageView
     private lateinit var favoriteButton: ImageView
@@ -43,18 +45,44 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var primaryGenreNameLabel: TextView
     private lateinit var countryLabel: TextView
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
-        val track = intent.getSerializableExtra(TRACK_DATA) as Track
-        val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
+        playerInteractor = Creator.providePlayerInteractor()
+
         val constraintLayout = findViewById<ConstraintLayout>(R.id.player_layout)
         val constraintSet = ConstraintSet()
         constraintSet.clone(constraintLayout)
-        buttonBack = findViewById(R.id.button_back)
+        bindViews()
+
+        playButton.setOnClickListener {
+            when (playerState) {
+                STATE_PLAYING -> {
+                    pausePlayer()
+                }
+
+                STATE_PREPARED, STATE_PAUSED -> {
+                    startPlayer()
+                }
+            }
+        }
+
+        playerToolbar.setNavigationOnClickListener {
+            playerInteractor.pausePlayer()
+            onBackPressed()
+        }
+
+        val trackJsonString = intent.getStringExtra(TRACK_DATA) ?: ""
+        getTrackDetails(trackJsonString)
+
+    }
+
+    private fun bindViews() {
         playButton = findViewById(R.id.button_play)
         queueButton = findViewById(R.id.button_queue)
         favoriteButton = findViewById(R.id.button_favorite)
+        playerToolbar = findViewById(R.id.player_toolbar)
 
         albumCover = findViewById(R.id.album_cover)
         trackName = findViewById(R.id.track_name)
@@ -71,12 +99,31 @@ class PlayerActivity : AppCompatActivity() {
         releaseDateLabel = findViewById(R.id.year_label)
         primaryGenreNameLabel = findViewById(R.id.genre_label)
         countryLabel = findViewById(R.id.country_label)
+    }
 
-        preparePlayer(track)
 
+    private fun getTrackDetails(trackJsonString: String) {
+        playerInteractor.getTrackDetails(trackJsonString, object : PlayerInteractor.TrackConsumer {
+
+            override fun consume(track: Track) {
+                runOnUiThread {
+                    setupTrackDetails(track)
+                    preparePlayer(track)
+                }
+            }
+
+            override fun onError(t: Throwable) {
+                runOnUiThread {
+                    Log.e(TAG, "Ошибка: ${t.message}", t)
+                }
+            }
+        })
+    }
+
+    private fun setupTrackDetails(track: Track) {
         trackName.text = track.trackName
         artistName.text = track.artistName
-        trackTime.text = dateFormat.format(track.trackTimeMillis)
+        trackTime.text = track.trackTimeString
         collectionName.text = track.collectionName
         releaseDate.text = track.releaseDate.substring(0, 4)
         primaryGenreName.text = track.primaryGenreName
@@ -90,6 +137,9 @@ class PlayerActivity : AppCompatActivity() {
             .into(albumCover)
 
         if (track.collectionName.isEmpty()) {
+            val constraintLayout = findViewById<ConstraintLayout>(R.id.player_layout)
+            val constraintSet = ConstraintSet()
+            constraintSet.clone(constraintLayout)
             collectionNameLabel.text = ""
             constraintSet.connect(
                 R.id.year_label,
@@ -111,31 +161,12 @@ class PlayerActivity : AppCompatActivity() {
             )
             constraintSet.applyTo(constraintLayout)
         }
-
-        buttonBack.setOnClickListener {
-            onBackPressed()
-        }
-
-        playButton.setOnClickListener {
-            when (playerState) {
-                STATE_PLAYING -> {
-                    pausePlayer()
-                }
-
-                STATE_PREPARED, STATE_PAUSED -> {
-                    startPlayer()
-                }
-            }
-        }
-
-
     }
 
     private fun startPlayer() {
-        mediaPlayer.start()
+        playerInteractor.startPlayer()
         playerState = STATE_PLAYING
         handler.post(updatePlayedTime())
-
         playButton.setImageResource(R.drawable.ic_pause)
     }
 
@@ -143,9 +174,8 @@ class PlayerActivity : AppCompatActivity() {
         return object : Runnable {
             override fun run() {
                 if (playerState == STATE_PLAYING) {
-                    playedTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(
-                        mediaPlayer.currentPosition
-                    )
+                    playedTime.text =
+                        playerInteractor.getCurrentPosition()
                     handler.postDelayed(this, TIMER_STEP / 2)
                 }
             }
@@ -153,25 +183,25 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun pausePlayer() {
-        mediaPlayer.pause()
+        playerInteractor.pausePlayer()
         playerState = STATE_PAUSED
         handler.removeCallbacks(updatePlayedTime())
         playButton.setImageResource(R.drawable.ic_play)
 
     }
-
     private fun preparePlayer(track: Track) {
-        mediaPlayer.setDataSource(track.previewUrl)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            playerState = STATE_PREPARED
-        }
-        mediaPlayer.setOnCompletionListener {
-            playerState = STATE_PREPARED
-            playedTime.setText(R.string.timer_start_time)
-            playButton.setImageResource(R.drawable.ic_play)
-        }
+        playerInteractor.preparePlayer(track,
+            onPrepared = {
+                playerState = STATE_PREPARED
+            },
+            onCompletion = {
+                playerState = STATE_PREPARED
+                playedTime.setText(R.string.timer_start_time)
+                playButton.setImageResource(R.drawable.ic_play)
+            }
+        )
     }
+
 
     override fun onPause() {
         super.onPause()
@@ -180,7 +210,7 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer.release()
+        playerInteractor.onDestroy()
     }
 
     companion object {

@@ -1,8 +1,7 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.search
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,62 +9,50 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.Track.Companion.TRACK_DATA
-import com.google.gson.Gson
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.util.concurrent.TimeUnit
+import com.example.playlistmaker.Creator
+import com.example.playlistmaker.R
+import com.example.playlistmaker.data.repository.SearchHistoryRepositoryImpl
+import com.example.playlistmaker.domain.api.interactors.TracksInteractor
+import com.example.playlistmaker.domain.api.repository.SearchHistoryRepository
+import com.example.playlistmaker.domain.api.repository.SelectedTrackRepository
+import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.domain.models.Track.Companion.TRACK_DATA
+import com.example.playlistmaker.ui.App
+import com.example.playlistmaker.ui.player.PlayerActivity
 
 class SearchActivity : AppCompatActivity() {
     private var searchText: String? = null
-    private val baseUrl = "https://itunes.apple.com"
-
-    private val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(10, TimeUnit.SECONDS)
-        .writeTimeout(10, TimeUnit.SECONDS)
-        .build()
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(baseUrl)
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val iTunesService = retrofit.create(iTunesSearchApi::class.java)
 
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { search() }
     private var isClickAllowed = true
 
-    private val gson = Gson()
     private val tracks = mutableListOf<Track>()
+    private lateinit var tracksInteractor: TracksInteractor
+    private lateinit var selectedTrackRepository: SelectedTrackRepository
     private lateinit var adapter: TrackAdapter
     private lateinit var adapterSearchHistory: TrackAdapter
     private lateinit var recyclerSearch: RecyclerView
     private lateinit var recyclerSearchHistory: RecyclerView
-    private lateinit var searchHistory: SearchHistory
-
+    private lateinit var searchHistoryRepository: SearchHistoryRepository
     private lateinit var progressBar: ProgressBar
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+        tracksInteractor = Creator.provideTracksInteractor()
+        selectedTrackRepository = Creator.getSelectedTrackRepository()
 
         val searchEditText = findViewById<EditText>(R.id.search_edit_text)
         val clearButton = findViewById<ImageView>(R.id.clear_button)
@@ -74,8 +61,8 @@ class SearchActivity : AppCompatActivity() {
         val searchHistoryLabel = findViewById<TextView>(R.id.search_history_label)
         val clearHistoryButton = findViewById<TextView>(R.id.clear_history_button)
         progressBar = findViewById(R.id.progress_bar)
-        searchHistory =
-            SearchHistory(getSharedPreferences(App.PM_PREFERENCES, MODE_PRIVATE))
+
+        searchHistoryRepository = SearchHistoryRepositoryImpl((application as App).sharedPref)
 
         val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -95,26 +82,32 @@ class SearchActivity : AppCompatActivity() {
 
             override fun afterTextChanged(s: Editable?) {}
         }
-        adapterSearchHistory = TrackAdapter(searchHistory.searchHistoryList) {
-            searchHistory.addToSearchHistory(it)
+        adapterSearchHistory = TrackAdapter(searchHistoryRepository.getSearchHistory()) {
+            searchHistoryRepository.addToSearchHistory(it)
             adapterSearchHistory.notifyDataSetChanged()
-            if (clickDebounce()) {startPlayerActivity(it)}
+            if (clickDebounce()) {
+                startPlayerActivity(it)
+            }
         }
         adapter = TrackAdapter(tracks) {
-            searchHistory.addToSearchHistory(it)
+            searchHistoryRepository.addToSearchHistory(it)
             adapterSearchHistory.notifyDataSetChanged()
-            if (clickDebounce()) {startPlayerActivity(it)}
+            if (clickDebounce()) {
+                startPlayerActivity(it)
+            }
 
         }
 
         searchEditText.setText(searchText)
         searchEditText.addTextChangedListener(textWatcher)
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && searchEditText.text.isEmpty() && searchHistory.searchHistoryList.isNotEmpty()) {
+            if (hasFocus && searchEditText.text.isEmpty() && searchHistoryRepository.getSearchHistory()
+                    .isNotEmpty()
+            ) {
                 searchHistoryLabel.visibility = View.VISIBLE
                 recyclerSearchHistory.visibility = View.VISIBLE
                 clearHistoryButton.visibility = View.VISIBLE
-                searchHistory.getSearchHistory()
+                searchHistoryRepository.getSearchHistory()
                 adapterSearchHistory.notifyDataSetChanged()
             }
         }
@@ -132,14 +125,14 @@ class SearchActivity : AppCompatActivity() {
             clearButton.visibility = View.GONE
         }
 
-        searchToolbar.setNavigationOnClickListener{
+        searchToolbar.setNavigationOnClickListener {
             onBackPressed()
         }
 
         clearHistoryButton.setOnClickListener {
-            searchHistory.getSearchHistory()
-            searchHistory.searchHistoryList.clear()
-            searchHistory.saveSearchHistory()
+            searchHistoryRepository.getSearchHistory()
+            searchHistoryRepository.clearSearchHistory()
+            searchHistoryRepository.saveSearchHistory()
             adapterSearchHistory.notifyDataSetChanged()
             searchHistoryLabel.visibility = View.GONE
             recyclerSearchHistory.visibility = View.GONE
@@ -159,16 +152,26 @@ class SearchActivity : AppCompatActivity() {
             search()
         }
 
+        recyclerSearch.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (!recyclerView.canScrollVertically(-1)) {
+                    showKeyboard(searchEditText)
+                } else if (dy > 0) {   // Прокрутка вниз
+                    hideKeyboard()
+                }
+            }
+        })
 
     }
-
-
 
     private fun startPlayerActivity(track: Track) {
+        val trackJsonString = selectedTrackRepository.dispatchTrackDetails(track)
         val intent = Intent(this@SearchActivity, PlayerActivity::class.java)
-        intent.putExtra(TRACK_DATA, track)
+        intent.putExtra(TRACK_DATA, trackJsonString)
         startActivity(intent)
     }
+
 
     private fun showError(errorType: String, imageResource: Int, errorMessageResource: Int) {
         val errorImage = findViewById<ImageView>(R.id.error_image)
@@ -191,59 +194,55 @@ class SearchActivity : AppCompatActivity() {
         errorText.isVisible = false
         refreshButton.isVisible = false
     }
+
     private fun searchDebounce() {
         handler.removeCallbacks(searchRunnable)
         handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
+
     private fun search() {
         showProgressBar()
-        iTunesService.search(searchText.toString()).enqueue(object : Callback<SearchResponse> {
-            override fun onResponse(
-                call: Call<SearchResponse>,
-                response: Response<SearchResponse>
-            ) {
-                val results = response.body()?.results
-                if (response.isSuccessful) {
-                    Log.d(TAG, "Response code: ${response.code()}")
-                    if (results?.isNotEmpty() == true) {
-                        hideError()
+
+        tracksInteractor.searchTracks(
+            searchText.toString(),
+            object : TracksInteractor.TracksConsumer {
+                override fun consume(foundTracks: List<Track>) {
+                    runOnUiThread {
                         hideProgressBar()
-                        tracks.clear()
-                        tracks.addAll(results)
-                        adapter.notifyDataSetChanged()
-                    } else {
+                        if (foundTracks.isNotEmpty()) {
+                            hideError()
+                            tracks.clear()
+                            tracks.addAll(foundTracks)
+                            adapter.notifyDataSetChanged()
+                        } else {
+                            showError(
+                                ERROR_NOTHING_FOUND,
+                                R.drawable.error_nothing_found,
+                                R.string.error_nothing_found
+                            )
+                            tracks.clear()
+                            adapter.notifyDataSetChanged()
+                        }
+                    }
+                }
+
+                override fun onError(t: Throwable) {
+                    runOnUiThread {
                         hideProgressBar()
+                        Log.e(TAG, "Ошибка: ${t.message}")
                         showError(
-                            ERROR_NOTHING_FOUND,
-                            R.drawable.error_nothing_found,
-                            R.string.error_nothing_found
+                            ERROR_CONNECTION,
+                            R.drawable.error_connection,
+                            R.string.error_connection
                         )
                         tracks.clear()
                         adapter.notifyDataSetChanged()
                     }
-                } else {
-                    hideProgressBar()
-                    Log.d(TAG, "Ошибка соединения: ${response.code()} - ${response.message()}")
-                    showError(
-                        ERROR_CONNECTION,
-                        R.drawable.error_connection,
-                        R.string.error_connection
-                    )
-                    tracks.clear()
-                    adapter.notifyDataSetChanged()
                 }
 
-            }
-
-            override fun onFailure(call: Call<SearchResponse>, t: Throwable) {
-                hideProgressBar()
-                Log.e(TAG, "Ошибка: ${t.message}", t)
-                showError(ERROR_CONNECTION, R.drawable.error_connection, R.string.error_connection)
-                tracks.clear()
-            }
-
-        })
+            })
     }
+
 
     private fun showProgressBar() {
         progressBar.isVisible = true
@@ -252,6 +251,7 @@ class SearchActivity : AppCompatActivity() {
         hideError()
 
     }
+
     private fun hideProgressBar() {
         progressBar.isVisible = false
         recyclerSearch.isVisible = true
@@ -275,13 +275,26 @@ class SearchActivity : AppCompatActivity() {
         hideError()
         super.onBackPressed()
     }
-    private fun clickDebounce() : Boolean {
+
+    private fun clickDebounce(): Boolean {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
             handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
         }
         return current
+    }
+
+    private fun hideKeyboard() {
+        val inputMethodManager =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+    }
+
+    private fun showKeyboard(view: View) {
+        val inputMethodManager =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
     }
 
     companion object {

@@ -1,17 +1,30 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.data.repository
 
-import android.content.SharedPreferences
+import com.example.playlistmaker.domain.api.repository.SearchHistoryRepository
+import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.ui.App
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import android.content.SharedPreferences
 
-class SearchHistory(private val sharedPref: SharedPreferences) {
+class SearchHistoryRepositoryImpl(private val sharedPref: SharedPreferences): SearchHistoryRepository {
     private val gson = Gson()
+
     var searchHistoryList: MutableList<Track> = mutableListOf()
     init {
         searchHistoryList = getSearchHistory()
     }
 
-    fun addToSearchHistory(selectedTrack: Track) {
+    override fun getSearchHistory(): MutableList<Track> {
+        var json = sharedPref.getString(App.SEARCH_HISTORY_KEY, null)
+        if (json != null) {
+            searchHistoryList.clear()
+            searchHistoryList.addAll(parseJson(json))
+        }
+        return searchHistoryList
+    }
+
+    override fun addToSearchHistory(selectedTrack: Track) {
         getSearchHistory()
         if (searchHistoryList.contains(selectedTrack)) {
             searchHistoryList.remove(selectedTrack)
@@ -24,16 +37,12 @@ class SearchHistory(private val sharedPref: SharedPreferences) {
         saveSearchHistory()
     }
 
-    fun getSearchHistory(): MutableList<Track> {
-        var json = sharedPref.getString(App.SEARCH_HISTORY_KEY, null)
-        if (json != null) {
-            searchHistoryList.clear()
-            searchHistoryList.addAll(parseJson(json))
-        }
-        return searchHistoryList
+    override fun clearSearchHistory() {
+        searchHistoryList.clear()
+        saveSearchHistory()
     }
 
-    fun saveSearchHistory() {
+    override fun saveSearchHistory() {
         val json = gson.toJson(searchHistoryList)
         sharedPref.edit()
             .putString(App.SEARCH_HISTORY_KEY, json)

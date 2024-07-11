@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui
 
 
 import android.content.Intent
@@ -9,7 +9,9 @@ import android.widget.ImageView
 import android.widget.Switch
 
 import android.widget.TextView
+import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
+import com.example.playlistmaker.R
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,18 +19,17 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
 
         val app = application as App
-        Log.d("PMtest", "Экран настроек, темная тема ${app.darkTheme}")
         val themeSwitcher = findViewById<Switch>(R.id.theme_switcher)
         themeSwitcher.isChecked = app.darkTheme
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
             app.switchTheme(checked)
         }
 
-
-        val buttonBack = findViewById<ImageView>(R.id.button_back)
-        buttonBack.setOnClickListener {
+        val settingsToolbar = findViewById<Toolbar>(R.id.settings_toolbar)
+        settingsToolbar.setNavigationOnClickListener {
             onBackPressed()
         }
+
         val share = findViewById<TextView>(R.id.share_app)
         share.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND)

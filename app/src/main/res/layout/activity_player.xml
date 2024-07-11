@@ -7,17 +7,16 @@
     android:id="@+id/player_layout"
     android:background="@color/primary_background_color">
 
-    <ImageView
-        android:id="@+id/button_back"
-        android:layout_width="wrap_content"
+    <Toolbar
+        android:id="@+id/player_toolbar"
+        style="@style/ToolbarTextStyle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_arrow_back_large"
+        android:clickable="true"
+        android:contentInsetStartWithNavigation="0dp"
+        android:navigationIcon="@drawable/ic_arrow_back_small"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="@dimen/extra_small_padding"
-        android:layout_marginTop="@dimen/extra_small_padding"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
 
     <ImageView
