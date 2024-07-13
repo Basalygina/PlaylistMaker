@@ -33,5 +33,7 @@ data class Track(
     companion object {
         const val TRACK_DATA = "TRACK_DATA"
         const val TRACK_DATA_ID = "TRACK_DATA_ID"
+        const val TRACK_DEFAULT_INT_VALUE = -1
+        const val TRACK_DEFAULT_STRING_VALUE = "not_available"
     }
 }

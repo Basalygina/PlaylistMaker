@@ -6,6 +6,9 @@ import com.example.playlistmaker.ui.App
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import android.content.SharedPreferences
+import com.example.playlistmaker.data.TrackMapper.toDomainModel
+import com.example.playlistmaker.data.TrackMapper.toDto
+import com.example.playlistmaker.data.dto.TrackDto
 
 class SearchHistoryRepositoryImpl(private val sharedPref: SharedPreferences): SearchHistoryRepository {
     private val gson = Gson()
@@ -43,7 +46,7 @@ class SearchHistoryRepositoryImpl(private val sharedPref: SharedPreferences): Se
     }
 
     override fun saveSearchHistory() {
-        val json = gson.toJson(searchHistoryList)
+        val json = gson.toJson(searchHistoryList.map { it.toDto() })
         sharedPref.edit()
             .putString(App.SEARCH_HISTORY_KEY, json)
             .apply()
@@ -52,11 +55,11 @@ class SearchHistoryRepositoryImpl(private val sharedPref: SharedPreferences): Se
     private fun parseJson(jsonString: String): MutableList<Track> {
         return try {
             // Если JSON это массив
-            val tracks = gson.fromJson(jsonString, Array<Track>::class.java).toMutableList()
-            tracks
+            val tracksDto = gson.fromJson(jsonString, Array<TrackDto>::class.java)
+            tracksDto.map { it.toDomainModel() }.toMutableList()
         } catch (e: JsonSyntaxException) {
             // Если JSON это объект
-            val track = gson.fromJson(jsonString, Track::class.java)
+            val track = gson.fromJson(jsonString, TrackDto::class.java).toDomainModel()
             mutableListOf(track)
         }
 

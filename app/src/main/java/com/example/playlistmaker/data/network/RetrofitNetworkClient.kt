@@ -4,7 +4,6 @@ import android.util.Log
 import com.example.playlistmaker.data.NetworkClient
 import com.example.playlistmaker.data.dto.Response
 import com.example.playlistmaker.data.dto.SearchRequest
-import com.example.playlistmaker.ui.search.SearchActivity.Companion.TAG
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

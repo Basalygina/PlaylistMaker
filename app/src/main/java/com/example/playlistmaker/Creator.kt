@@ -1,5 +1,7 @@
 package com.example.playlistmaker
 
+import com.example.playlistmaker.data.handler.MediaPlayerHandlerImpl
+import com.example.playlistmaker.data.handler.PlayerHandler
 import com.example.playlistmaker.data.network.RetrofitNetworkClient
 import com.example.playlistmaker.data.network.TracksRepositoryImpl
 import com.example.playlistmaker.data.repository.SelectedTrackRepositoryImpl
@@ -24,6 +26,10 @@ object Creator {
     }
 
     fun providePlayerInteractor(): PlayerInteractor {
-        return PlayerInteractorImpl(getSelectedTrackRepository())
+        return PlayerInteractorImpl(getPlayerHandler(), getSelectedTrackRepository())
+    }
+
+    private fun getPlayerHandler(): PlayerHandler {
+        return MediaPlayerHandlerImpl()
     }
 }

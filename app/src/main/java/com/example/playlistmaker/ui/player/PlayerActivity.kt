@@ -78,28 +78,7 @@ class PlayerActivity : AppCompatActivity() {
 
     }
 
-    private fun bindViews() {
-        playButton = findViewById(R.id.button_play)
-        queueButton = findViewById(R.id.button_queue)
-        favoriteButton = findViewById(R.id.button_favorite)
-        playerToolbar = findViewById(R.id.player_toolbar)
 
-        albumCover = findViewById(R.id.album_cover)
-        trackName = findViewById(R.id.track_name)
-        artistName = findViewById(R.id.artist_name)
-        trackTime = findViewById(R.id.track_time_data)
-        collectionName = findViewById(R.id.collection_data)
-        releaseDate = findViewById(R.id.year_data)
-        primaryGenreName = findViewById(R.id.genre_data)
-        country = findViewById(R.id.country_data)
-        playedTime = findViewById(R.id.played_time)
-
-        trackTimeLabel = findViewById(R.id.track_time_label)
-        collectionNameLabel = findViewById(R.id.collection_label)
-        releaseDateLabel = findViewById(R.id.year_label)
-        primaryGenreNameLabel = findViewById(R.id.genre_label)
-        countryLabel = findViewById(R.id.country_label)
-    }
 
 
     private fun getTrackDetails(trackJsonString: String) {
@@ -211,6 +190,29 @@ class PlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         playerInteractor.onDestroy()
+    }
+
+    private fun bindViews() {
+        playButton = findViewById(R.id.button_play)
+        queueButton = findViewById(R.id.button_queue)
+        favoriteButton = findViewById(R.id.button_favorite)
+        playerToolbar = findViewById(R.id.player_toolbar)
+
+        albumCover = findViewById(R.id.album_cover)
+        trackName = findViewById(R.id.track_name)
+        artistName = findViewById(R.id.artist_name)
+        trackTime = findViewById(R.id.track_time_data)
+        collectionName = findViewById(R.id.collection_data)
+        releaseDate = findViewById(R.id.year_data)
+        primaryGenreName = findViewById(R.id.genre_data)
+        country = findViewById(R.id.country_data)
+        playedTime = findViewById(R.id.played_time)
+
+        trackTimeLabel = findViewById(R.id.track_time_label)
+        collectionNameLabel = findViewById(R.id.collection_label)
+        releaseDateLabel = findViewById(R.id.year_label)
+        primaryGenreNameLabel = findViewById(R.id.genre_label)
+        countryLabel = findViewById(R.id.country_label)
     }
 
     companion object {

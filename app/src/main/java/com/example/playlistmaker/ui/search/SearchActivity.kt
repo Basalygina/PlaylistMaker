@@ -9,6 +9,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
@@ -47,6 +48,13 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchHistoryRepository: SearchHistoryRepository
     private lateinit var progressBar: ProgressBar
 
+    private lateinit var searchEditText: EditText
+    private lateinit var clearButton: ImageView
+    private lateinit var searchToolbar: Toolbar
+    private lateinit var refreshButton: TextView
+    private lateinit var searchHistoryLabel: TextView
+    private lateinit var clearHistoryButton: TextView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,12 +62,12 @@ class SearchActivity : AppCompatActivity() {
         tracksInteractor = Creator.provideTracksInteractor()
         selectedTrackRepository = Creator.getSelectedTrackRepository()
 
-        val searchEditText = findViewById<EditText>(R.id.search_edit_text)
-        val clearButton = findViewById<ImageView>(R.id.clear_button)
-        val searchToolbar = findViewById<Toolbar>(R.id.search_toolbar)
-        val refreshButton = findViewById<TextView>(R.id.refresh_button)
-        val searchHistoryLabel = findViewById<TextView>(R.id.search_history_label)
-        val clearHistoryButton = findViewById<TextView>(R.id.clear_history_button)
+        searchEditText = findViewById<EditText>(R.id.search_edit_text)
+        clearButton = findViewById<ImageView>(R.id.clear_button)
+        searchToolbar = findViewById<Toolbar>(R.id.search_toolbar)
+        refreshButton = findViewById<TextView>(R.id.refresh_button)
+        searchHistoryLabel = findViewById<TextView>(R.id.search_history_label)
+        clearHistoryButton = findViewById<TextView>(R.id.clear_history_button)
         progressBar = findViewById(R.id.progress_bar)
 
         searchHistoryRepository = SearchHistoryRepositoryImpl((application as App).sharedPref)
@@ -75,21 +83,23 @@ class SearchActivity : AppCompatActivity() {
                     clearHistoryButton.visibility = View.GONE
                     searchText = s.toString()
                     searchDebounce()
+                } else {
+                    clearSearchQuery()
                 }
-
-
             }
 
             override fun afterTextChanged(s: Editable?) {}
         }
-        adapterSearchHistory = TrackAdapter(searchHistoryRepository.getSearchHistory()) {
+        adapterSearchHistory = TrackAdapter(searchHistoryRepository.getSearchHistory())
+        {
             searchHistoryRepository.addToSearchHistory(it)
             adapterSearchHistory.notifyDataSetChanged()
             if (clickDebounce()) {
                 startPlayerActivity(it)
             }
         }
-        adapter = TrackAdapter(tracks) {
+        adapter = TrackAdapter(tracks)
+        {
             searchHistoryRepository.addToSearchHistory(it)
             adapterSearchHistory.notifyDataSetChanged()
             if (clickDebounce()) {
@@ -101,28 +111,17 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.setText(searchText)
         searchEditText.addTextChangedListener(textWatcher)
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && searchEditText.text.isEmpty() && searchHistoryRepository.getSearchHistory()
-                    .isNotEmpty()
+            if (hasFocus && searchEditText.text.isEmpty() &&
+                searchHistoryRepository.getSearchHistory().isNotEmpty()
             ) {
-                searchHistoryLabel.visibility = View.VISIBLE
-                recyclerSearchHistory.visibility = View.VISIBLE
-                clearHistoryButton.visibility = View.VISIBLE
-                searchHistoryRepository.getSearchHistory()
-                adapterSearchHistory.notifyDataSetChanged()
+                showSearchHistory()
             }
         }
 
         clearButton.setOnClickListener {
-            searchEditText.text.clear()
+            clearSearchQuery()
             searchEditText.clearFocus()
-            searchText = EMPTY_TEXT
-            hideError()
-            tracks.clear()
-            adapter.notifyDataSetChanged()
-            val inputMethodManager =
-                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.hideSoftInputFromWindow(searchEditText.windowToken, 0)
-            clearButton.visibility = View.GONE
+            hideKeyboard()
         }
 
         searchToolbar.setNavigationOnClickListener {
@@ -152,26 +151,55 @@ class SearchActivity : AppCompatActivity() {
             search()
         }
 
-        recyclerSearch.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (!recyclerView.canScrollVertically(-1)) {
-                    showKeyboard(searchEditText)
-                } else if (dy > 0) {   // Прокрутка вниз
-                    hideKeyboard()
+        recyclerSearch.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (dy > 0) {   // Скрытие клавиатуры при прокрутке вниз
+                        hideKeyboard()
+                    }
                 }
+            })
+
+        searchEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                searchEditText.clearFocus()
+                hideKeyboard()
+                true
+            } else {
+                false
             }
-        })
+        }
 
     }
 
     private fun startPlayerActivity(track: Track) {
-        val trackJsonString = selectedTrackRepository.dispatchTrackDetails(track)
+        val trackJsonString = selectedTrackRepository.encodeTrackDetails(track)
         val intent = Intent(this@SearchActivity, PlayerActivity::class.java)
         intent.putExtra(TRACK_DATA, trackJsonString)
         startActivity(intent)
     }
 
+    private fun clearSearchQuery() {
+        searchEditText.text.clear()
+        searchText = EMPTY_TEXT
+        tracks.clear()
+        adapter.notifyDataSetChanged()
+        handler.removeCallbacks(searchRunnable)
+        clearButton.visibility = View.GONE
+        hideError()
+        if (searchHistoryRepository.getSearchHistory().isNotEmpty()) {
+            showSearchHistory()
+        }
+    }
+
+    private fun showSearchHistory() {
+        searchHistoryLabel.visibility = View.VISIBLE
+        recyclerSearchHistory.visibility = View.VISIBLE
+        clearHistoryButton.visibility = View.VISIBLE
+        searchHistoryRepository.getSearchHistory()
+        adapterSearchHistory.notifyDataSetChanged()
+    }
 
     private fun showError(errorType: String, imageResource: Int, errorMessageResource: Int) {
         val errorImage = findViewById<ImageView>(R.id.error_image)
