@@ -6,8 +6,6 @@ import com.example.playlistmaker.search.domain.Track
 import com.example.playlistmaker.config.App
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import android.content.SharedPreferences
-import com.example.playlistmaker.config.domain.ThemeRepository
 import com.example.playlistmaker.search.data.TrackMapper.toDomainModel
 import com.example.playlistmaker.search.data.TrackMapper.toDto
 import com.example.playlistmaker.search.data.dto.TrackDto

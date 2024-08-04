@@ -1,9 +1,8 @@
-package com.example.playlistmaker.config.data
+package com.example.playlistmaker.settings.data
 
-import android.content.SharedPreferences
 import android.content.Context
 import com.example.playlistmaker.config.App
-import com.example.playlistmaker.config.domain.ThemeRepository
+import com.example.playlistmaker.settings.domain.ThemeRepository
 
 class ThemeRepositoryImpl(context: Context) : ThemeRepository {
     private val sharedPref = context.getSharedPreferences(App.PM_PREFERENCES, Context.MODE_PRIVATE)

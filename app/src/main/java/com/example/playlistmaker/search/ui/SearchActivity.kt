@@ -9,11 +9,13 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
+import com.example.playlistmaker.config.App
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.player.domain.SelectedTrackRepository
 import com.example.playlistmaker.player.ui.PlayerActivity
@@ -24,23 +26,18 @@ import com.example.playlistmaker.search.domain.TracksInteractor
 class SearchActivity : AppCompatActivity() {
     private var searchText: String? = null
     private var isClickAllowed = true
-    private val tracks = mutableListOf<Track>()
     private lateinit var selectedTrack: Track
-    private lateinit var viewModel: SearchViewModel
-    private lateinit var tracksInteractor: TracksInteractor
-    private lateinit var selectedTrackRepository: SelectedTrackRepository
     private lateinit var adapter: TrackAdapter
     private lateinit var adapterSearchHistory: TrackAdapter
     private lateinit var binding: ActivitySearchBinding
+    private val viewModel by viewModels<SearchViewModel> {
+        SearchViewModel.getViewModelFactory(applicationContext)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        viewModel = ViewModelProvider(
-            this,
-            SearchViewModel.getViewModelFactory()
-        ).get(SearchViewModel::class.java)
         viewModel.searchScreenState.observe(this) { state ->
             when (state) {
                 SearchScreenState.Loading -> showLoading()
@@ -71,7 +68,7 @@ class SearchActivity : AppCompatActivity() {
         adapterSearchHistory = TrackAdapter(mutableListOf()) {
             selectTrack(it)
         }
-        adapter = TrackAdapter(tracks) {
+        adapter = TrackAdapter(mutableListOf()) {
             selectTrack(it)
         }
 
@@ -244,7 +241,6 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         searchText = EMPTY_TEXT
-        tracks.clear()
         hideUnusedViews()
         super.onBackPressed()
     }

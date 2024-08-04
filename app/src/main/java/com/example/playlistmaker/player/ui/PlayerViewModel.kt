@@ -18,9 +18,7 @@ import com.example.playlistmaker.search.domain.Track
 import com.example.playlistmaker.config.App.Companion.TAG
 
 class PlayerViewModel(
-    private val trackJsonString: String,
-    private val playerInteractor: PlayerInteractor,
-    private val trackRepository: SelectedTrackRepository
+    private val playerInteractor: PlayerInteractor
 ) : ViewModel() {
 
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -75,7 +73,7 @@ class PlayerViewModel(
 
 
 
-    fun getTrackDetails() {
+    fun setCurrentTrack(trackJsonString: String) {
         _trackState.postValue(SelectedTrackState.Loading)
         playerInteractor.getTrackDetails(trackJsonString, object : PlayerInteractor.TrackConsumer {
             override fun consume(track: Track) {
@@ -113,15 +111,12 @@ class PlayerViewModel(
 
     companion object {
         private const val TIMER_STEP = 1_000L
-        fun getViewModelFactory(trackJsonString: String): ViewModelProvider.Factory =
+
+        fun getViewModelFactory(): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    val interactor = Creator.providePlayerInteractor()
-                    val trackRepository = Creator.getSelectedTrackRepository()
                     PlayerViewModel(
-                        trackJsonString,
-                        interactor,
-                        trackRepository
+                        Creator.providePlayerInteractor()
                     )
                 }
             }

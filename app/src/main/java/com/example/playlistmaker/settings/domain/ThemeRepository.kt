@@ -1,4 +1,4 @@
-package com.example.playlistmaker.config.domain
+package com.example.playlistmaker.settings.domain
 
 interface ThemeRepository {
     var isDarkMode: Boolean

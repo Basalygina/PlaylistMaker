@@ -1,41 +1,33 @@
 package com.example.playlistmaker.config
 
 import android.app.Application
-
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-import com.example.playlistmaker.config.domain.ThemeRepository
 import com.example.playlistmaker.creator.Creator
 
 class App : Application() {
-    var isDarkMode = false
-    lateinit var themeRepo: ThemeRepository
 
     override fun onCreate() {
         super.onCreate()
-        themeRepo = Creator.getThemeRepository(this)
-        if (themeRepo.isThemePreferencesExists) {
-                isDarkMode = themeRepo.isDarkMode
-                switchTheme(isDarkMode)
-            } else {
-                val uiModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-                AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
-                isDarkMode = uiModeFlags == Configuration.UI_MODE_NIGHT_YES
-            }
+        val themeInteractor = Creator.provideThemeInteractor(this)
+        if (themeInteractor.initializeThemeFromPreferences()) {
+            AppCompatDelegate.setDefaultNightMode(
+                if (themeInteractor.isDarkMode()) {
+                    AppCompatDelegate.MODE_NIGHT_YES
+                } else {
+                    AppCompatDelegate.MODE_NIGHT_NO
+                }
+            )
+        } else {
+            val uiModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            AppCompatDelegate.setDefaultNightMode(
+                if (uiModeFlags == Configuration.UI_MODE_NIGHT_YES) {
+                    AppCompatDelegate.MODE_NIGHT_YES
+                } else {
+                    AppCompatDelegate.MODE_NIGHT_NO
+                }
+            )
         }
-
-    fun switchTheme(darkThemeEnabled: Boolean) {
-        isDarkMode = darkThemeEnabled
-        themeRepo.isDarkMode = isDarkMode
-        AppCompatDelegate.setDefaultNightMode(
-            if (isDarkMode) {
-                AppCompatDelegate.MODE_NIGHT_YES
-            } else {
-                AppCompatDelegate.MODE_NIGHT_NO
-            }
-        )
-
     }
 
     companion object {
@@ -44,4 +36,10 @@ class App : Application() {
         const val TAG = "PMtest"
     }
 }
+
+
+
+
+
+
 

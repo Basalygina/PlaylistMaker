@@ -1,6 +1,7 @@
 package com.example.playlistmaker.search.ui
 
 import android.app.Application
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -8,23 +9,21 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.playlistmaker.config.App
 import com.example.playlistmaker.config.App.Companion.TAG
 import com.example.playlistmaker.creator.Creator
-import com.example.playlistmaker.search.data.SearchHistoryRepositoryImpl
 import com.example.playlistmaker.search.domain.Track
 import com.example.playlistmaker.search.domain.TracksInteractor
 
-class SearchViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val tracksInteractor = Creator.provideTracksInteractor(getApplication<Application>())
-    private val selectedTrackRepository = Creator.getSelectedTrackRepository()
-    private val searchHistoryRepository = SearchHistoryRepositoryImpl(getApplication<Application>())
+class SearchViewModel(private val tracksInteractor: TracksInteractor): ViewModel() {
     private val handler = Handler(Looper.getMainLooper())
     val tracks = mutableListOf<Track>()
+    val searchHistory = mutableListOf<Track>()
 
     private val _searchScreenState = MutableLiveData<SearchScreenState>()
     val searchScreenState: LiveData<SearchScreenState> = _searchScreenState
@@ -32,8 +31,10 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     private var latestSearchText: String? = null
 
     init {
-        if (searchHistoryRepository.getSearchHistory().isNotEmpty()) {
-            updateSearchScreenState(SearchScreenState.SearchHistory(searchHistoryRepository.getSearchHistory()))
+        searchHistory.clear()
+        searchHistory.addAll(tracksInteractor.getSearchHistory())
+        if (searchHistory.isNotEmpty()) {
+            updateSearchScreenState(SearchScreenState.SearchHistory(searchHistory))
         } else {
             updateSearchScreenState(SearchScreenState.Prepared)
         }
@@ -90,12 +91,13 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
 
     fun clearSearchHistory() {
-        searchHistoryRepository.clearSearchHistory()
+        tracksInteractor.clearSearchHistory()
         updateSearchScreenState(SearchScreenState.Prepared)
     }
 
     fun getSearchHistory() {
-        val searchHistory = searchHistoryRepository.getSearchHistory()
+        searchHistory.clear()
+        searchHistory.addAll(tracksInteractor.getSearchHistory())
         if (searchHistory.isNotEmpty()) {
             updateSearchScreenState(SearchScreenState.SearchHistory(searchHistory))
         } else {
@@ -104,9 +106,10 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun onTrackSelected(track: Track) {
-        val trackJsonString = selectedTrackRepository.encodeTrackDetails(track)
-        searchHistoryRepository.addToSearchHistory(track)
-        val searchHistory = searchHistoryRepository.getSearchHistory()
+        val trackJsonString = tracksInteractor.encodeTrackDetails(track)
+        tracksInteractor.addToSearchHistory(track)
+        searchHistory.clear()
+        searchHistory.addAll(tracksInteractor.getSearchHistory())
         if (searchHistory.isNotEmpty()) {
             updateSearchScreenState(SearchScreenState.SearchHistory(searchHistory))
         } else {
@@ -121,9 +124,9 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
 
     companion object {
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
+        fun getViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                SearchViewModel(this[APPLICATION_KEY] as Application)
+                SearchViewModel(Creator.provideTracksInteractor(context))
             }
         }
 
@@ -131,4 +134,6 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         private const val SEARCH_DEBOUNCE_DELAY = 2_000L
         private val SEARCH_REQUEST_TOKEN = Any()
     }
+
 }
+

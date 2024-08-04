@@ -7,9 +7,11 @@ import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toolbar
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -22,7 +24,9 @@ import com.example.playlistmaker.search.domain.Track.Companion.TRACK_DATA
 class PlayerActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var binding: ActivityPlayerBinding
-    private lateinit var viewModel: PlayerViewModel
+    private val viewModel by viewModels<PlayerViewModel> {
+        PlayerViewModel.getViewModelFactory()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,16 +34,13 @@ class PlayerActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val trackJsonString = intent.getStringExtra(TRACK_DATA) ?: ""
-        viewModel = ViewModelProvider(
-            this,
-            PlayerViewModel.getViewModelFactory(trackJsonString)
-        )[PlayerViewModel::class.java]
-
-        viewModel.getTrackDetails()
+        viewModel.setCurrentTrack(trackJsonString)
 
         viewModel.trackState.observe(this) { state ->
             when (state) {
-                is SelectedTrackState.Loading -> Unit
+                is SelectedTrackState.Loading -> {
+                    onLoadingTrackDetails()
+                }
                 is SelectedTrackState.Content -> {
                     setupTrackDetails(state.trackModel)}
             }
@@ -67,6 +68,10 @@ class PlayerActivity : AppCompatActivity() {
 
     }
 
+    private fun onLoadingTrackDetails() {
+        binding.buttonPlay.isVisible = false
+    }
+
     private fun preparePlayerUi() {
         binding.playedTime.setText(R.string.timer_start_time)
         binding.buttonPlay.setImageResource(R.drawable.ic_play)
@@ -80,6 +85,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.yearData.text = track.releaseDate.substring(0, 4)
         binding.genreData.text = track.primaryGenreName
         binding.countryData.text = track.country
+        binding.buttonPlay.isVisible = true
 
         Glide.with(applicationContext)
             .load(track.artworkUrl512)
