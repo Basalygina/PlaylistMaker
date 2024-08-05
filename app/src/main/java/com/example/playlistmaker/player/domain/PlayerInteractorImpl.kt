@@ -1,5 +1,4 @@
 package com.example.playlistmaker.player.domain
-import android.util.Log
 import com.example.playlistmaker.player.data.PlayerHandler
 import com.example.playlistmaker.search.domain.Track
 import com.example.playlistmaker.config.App.Companion.TAG
@@ -18,12 +17,9 @@ class PlayerInteractorImpl(
     ) {
         executor.execute {
             try {
-                Log.d(TAG, "Starting to decode track details")
                 val track = repository.decodeTrackDetails(trackJsonString)
-                Log.d(TAG, "Decoded track details: ${track.trackName}")
                 consumer.consume(track)
             } catch (t: Throwable) {
-                Log.e(TAG, "Error decoding track details", t)
                 consumer.onError(t)
             }
         }
