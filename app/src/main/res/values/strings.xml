@@ -15,7 +15,7 @@
     <string name="track_title">Название</string>
     <string name="artist">Исполнитель</string>
     <string name="separator_artist_duration">•</string>
-    <string name="error_nothing_found">Ничего не нашлось</string>
+    <string name="nothing_found">Ничего не нашлось</string>
     <string name="error_connection">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
     <string name="refresh">Обновить</string>
     <string name="search_history">Вы искали</string>
