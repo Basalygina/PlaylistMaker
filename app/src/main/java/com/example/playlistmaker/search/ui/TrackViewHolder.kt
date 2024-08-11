@@ -10,7 +10,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.search.domain.Track
 
 
-class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val trackNameView: TextView
     private val artistNameView: TextView
     private val trackTimeView: TextView

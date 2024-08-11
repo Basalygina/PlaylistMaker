@@ -5,18 +5,18 @@ import com.example.playlistmaker.search.domain.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class MediaPlayerHandlerImpl: PlayerHandler {
-    private val mediaPlayer = MediaPlayer()
+class MediaPlayerHandlerImpl(private var mediaPlayer: MediaPlayer) : PlayerHandler {
 
     override fun preparePlayer(track: Track, onPrepared: () -> Unit, onCompletion: () -> Unit) {
+        mediaPlayer.reset()  // Сбрасываем MediaPlayer перед его повторным использованием
         mediaPlayer.setDataSource(track.previewUrl)
-        mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
             onPrepared()
         }
         mediaPlayer.setOnCompletionListener {
             onCompletion()
         }
+        mediaPlayer.prepareAsync()
     }
 
     override fun play() {
@@ -31,8 +31,8 @@ class MediaPlayerHandlerImpl: PlayerHandler {
         return SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
     }
 
-    override fun shutdownPlayer() {
-        mediaPlayer.release()
+    override fun stopPlayer() {
+        mediaPlayer.stop()
     }
 
 

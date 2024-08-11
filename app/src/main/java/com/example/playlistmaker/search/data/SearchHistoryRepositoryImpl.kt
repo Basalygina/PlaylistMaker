@@ -1,6 +1,7 @@
 package com.example.playlistmaker.search.data
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.example.playlistmaker.search.domain.SearchHistoryRepository
 import com.example.playlistmaker.search.domain.Track
 import com.example.playlistmaker.config.App
@@ -11,10 +12,10 @@ import com.example.playlistmaker.search.data.TrackMapper.toDto
 import com.example.playlistmaker.search.data.dto.TrackDto
 
 
-class SearchHistoryRepositoryImpl(context: Context):
+class SearchHistoryRepositoryImpl(
+    private val gson: Gson,
+    private val sharedPref: SharedPreferences):
     SearchHistoryRepository {
-    private val gson = Gson()
-    private val sharedPref = context.getSharedPreferences(App.PM_PREFERENCES, Context.MODE_PRIVATE)
 
     var searchHistoryList: MutableList<Track> = mutableListOf()
     init {

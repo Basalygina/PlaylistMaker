@@ -50,5 +50,6 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("androidx.activity:activity-ktx:1.7.2")
     implementation("androidx.fragment:fragment-ktx:1.5.7")
+    implementation("io.insert-koin:koin-android:3.3.0")
 
 }

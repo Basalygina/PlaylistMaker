@@ -9,30 +9,24 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
-import com.example.playlistmaker.config.App
+import com.example.playlistmaker.config.App.Companion.TAG
 import com.example.playlistmaker.databinding.ActivitySearchBinding
-import com.example.playlistmaker.player.domain.SelectedTrackRepository
 import com.example.playlistmaker.player.ui.PlayerActivity
 import com.example.playlistmaker.search.domain.Track
 import com.example.playlistmaker.search.domain.Track.Companion.TRACK_DATA
-import com.example.playlistmaker.search.domain.TracksInteractor
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
-    private var searchText: String? = null
     private var isClickAllowed = true
     private lateinit var selectedTrack: Track
     private lateinit var adapter: TrackAdapter
     private lateinit var adapterSearchHistory: TrackAdapter
     private lateinit var binding: ActivitySearchBinding
-    private val viewModel by viewModels<SearchViewModel> {
-        SearchViewModel.getViewModelFactory(applicationContext)
-    }
+    private val viewModel: SearchViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,16 +66,16 @@ class SearchActivity : AppCompatActivity() {
             selectTrack(it)
         }
 
-        binding.searchEditText.setText(searchText)
         binding.searchEditText.addTextChangedListener(textWatcher)
         binding.searchEditText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && binding.searchEditText.text.isEmpty() ) {
+            if (hasFocus && binding.searchEditText.text.isEmpty()) {
                 viewModel.getSearchHistory()
             }
         }
 
         binding.clearTextButton.setOnClickListener {
             clearSearchQuery()
+            binding.searchEditText.setText(EMPTY_TEXT)
             binding.searchEditText.clearFocus()
             hideKeyboard()
         }
@@ -191,8 +185,6 @@ class SearchActivity : AppCompatActivity() {
 
     private fun clearSearchQuery() {
         hideUnusedViews()
-        binding.searchEditText.text.clear()
-        searchText = EMPTY_TEXT
         adapter.clearTracks()
         binding.clearTextButton.visibility = View.GONE
         viewModel.stopDelayedSearchRequest()
@@ -230,23 +222,25 @@ class SearchActivity : AppCompatActivity() {
 
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString(SEARCH_TEXT, searchText)
+        outState.putString(SEARCH_TEXT, binding.searchEditText.text.toString())
         super.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        searchText = savedInstanceState.getString(SEARCH_TEXT)
         super.onRestoreInstanceState(savedInstanceState)
+        val restoredText = savedInstanceState.getString(SEARCH_TEXT, "")
+        binding.searchEditText.setText(restoredText)
+        viewModel.searchDebounce(restoredText)
     }
 
     override fun onBackPressed() {
-        searchText = EMPTY_TEXT
+        binding.searchEditText.setText(EMPTY_TEXT)
         hideUnusedViews()
         super.onBackPressed()
     }
 
 
-    companion object{
+    companion object {
         const val SEARCH_TEXT = "SEARCH_TEXT"
         const val EMPTY_TEXT = ""
         const val ERROR_NOTHING_FOUND = "ERROR_NOTHING_FOUND"

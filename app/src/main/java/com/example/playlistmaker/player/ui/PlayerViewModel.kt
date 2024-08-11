@@ -1,26 +1,18 @@
 package com.example.playlistmaker.player.ui
 
-import android.app.Application
 import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.creator.Creator
-import com.example.playlistmaker.player.domain.PlayerInteractor
-import com.example.playlistmaker.player.domain.SelectedTrackRepository
-import com.example.playlistmaker.search.domain.Track
 import com.example.playlistmaker.config.App.Companion.TAG
+import com.example.playlistmaker.player.domain.PlayerInteractor
+import com.example.playlistmaker.search.domain.Track
 
 class PlayerViewModel(
-    private val playerInteractor: PlayerInteractor
+    private val playerInteractor: PlayerInteractor,
+    private val mainHandler: Handler
 ) : ViewModel() {
-
-    private val mainHandler = Handler(Looper.getMainLooper())
     private var timerRunnable: Runnable? = null
 
     private val _playerState = MutableLiveData<PlayerScreenState>()
@@ -32,22 +24,27 @@ class PlayerViewModel(
     private val _currentTime = MutableLiveData<String>()
     val currentTime: LiveData<String> = _currentTime
 
-    fun togglePlayPause(){
+    fun togglePlayPause() {
         when (_playerState.value) {
             PlayerScreenState.Playing -> pause()
             else -> play()
         }
     }
+
     fun play() {
-        if (_playerState.value != PlayerScreenState.Playing) {
+        // Проверка, что плеер готов перед воспроизведением
+        if (_playerState.value == PlayerScreenState.Prepared || _playerState.value == PlayerScreenState.Paused) {
             playerInteractor.startPlayer()
             _playerState.value = PlayerScreenState.Playing
             updatePlayedTime()
+        } else {
+            Log.d(TAG, "Player state is not ready for playback: ${_playerState.value}")
         }
     }
 
+
     private fun updatePlayedTime() {
-        timerRunnable = object : Runnable  {
+        timerRunnable = object : Runnable {
             override fun run() {
                 if (_playerState.value == PlayerScreenState.Playing) {
                     _currentTime.value = playerInteractor.getCurrentPosition()
@@ -69,7 +66,6 @@ class PlayerViewModel(
             stopUpdaitingTime()
         }
     }
-
 
 
     fun setCurrentTrack(trackJsonString: String) {
@@ -96,9 +92,13 @@ class PlayerViewModel(
 
     private fun preparePlayer(track: Track) {
         playerInteractor.preparePlayer(track, onPrepared = {
-            _playerState.postValue(PlayerScreenState.Prepared)
+            if (_playerState.value != PlayerScreenState.Prepared) {
+                _playerState.postValue(PlayerScreenState.Prepared)
+            }
         }, onCompletion = {
-            _playerState.postValue(PlayerScreenState.Prepared)
+            if (_playerState.value == PlayerScreenState.Playing) {
+                _playerState.postValue(PlayerScreenState.Prepared)
+            }
         })
     }
 
@@ -110,15 +110,5 @@ class PlayerViewModel(
 
     companion object {
         private const val TIMER_STEP = 1_000L
-
-        fun getViewModelFactory(): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    PlayerViewModel(
-                        Creator.providePlayerInteractor()
-                    )
-                }
-            }
-
     }
 }

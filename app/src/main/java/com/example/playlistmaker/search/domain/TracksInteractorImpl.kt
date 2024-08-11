@@ -1,14 +1,14 @@
 package com.example.playlistmaker.search.domain
 
 import com.example.playlistmaker.player.domain.SelectedTrackRepository
-import java.util.concurrent.Executors
+import java.util.concurrent.Executor
 
 class TracksInteractorImpl(
     private val repository: TracksRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
-    private val selectedTrackRepository: SelectedTrackRepository
+    private val selectedTrackRepository: SelectedTrackRepository,
+    private val executor: Executor
 ): TracksInteractor {
-    private val executor = Executors.newCachedThreadPool()
 
     override fun searchTracks(expression: String, consumer: TracksInteractor.TracksConsumer) {
         executor.execute {
