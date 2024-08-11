@@ -1,15 +1,14 @@
 package com.example.playlistmaker.player.domain
+
 import com.example.playlistmaker.player.data.PlayerHandler
 import com.example.playlistmaker.search.domain.Track
-import com.example.playlistmaker.config.App.Companion.TAG
-import java.util.concurrent.Executors
+import java.util.concurrent.Executor
 
 class PlayerInteractorImpl(
     private val playerHandler: PlayerHandler,
-    private val repository: SelectedTrackRepository
+    private val repository: SelectedTrackRepository,
+    private val executor: Executor
 ) : PlayerInteractor {
-    private val executor = Executors.newCachedThreadPool()
-
 
     override fun getTrackDetails(
         trackJsonString: String,
@@ -43,7 +42,7 @@ class PlayerInteractorImpl(
     }
 
     override fun onDestroy() {
-        playerHandler.shutdownPlayer()
+        playerHandler.stopPlayer()
     }
 
 }

@@ -1,11 +1,12 @@
 package com.example.playlistmaker.settings.data
 
-import android.content.Context
+import android.content.SharedPreferences
 import com.example.playlistmaker.config.App
 import com.example.playlistmaker.settings.domain.ThemeRepository
 
-class ThemeRepositoryImpl(context: Context) : ThemeRepository {
-    private val sharedPref = context.getSharedPreferences(App.PM_PREFERENCES, Context.MODE_PRIVATE)
+class ThemeRepositoryImpl(
+    private val sharedPref: SharedPreferences
+) : ThemeRepository {
 
     override var isDarkMode: Boolean
         get() = sharedPref.getBoolean(App.NIGHT_MODE_KEY, false)

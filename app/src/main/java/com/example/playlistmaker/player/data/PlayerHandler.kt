@@ -7,5 +7,5 @@ interface PlayerHandler {
     fun play()
     fun pause()
     fun getCurrentPosition(): String
-    fun shutdownPlayer()
+    fun stopPlayer()
 }

@@ -1,32 +1,20 @@
 package com.example.playlistmaker.player.ui
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toolbar
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
-import com.example.playlistmaker.player.domain.PlayerInteractor
 import com.example.playlistmaker.search.domain.Track
 import com.example.playlistmaker.search.domain.Track.Companion.TRACK_DATA
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlayerActivity : AppCompatActivity() {
-    private val handler = Handler(Looper.getMainLooper())
     private lateinit var binding: ActivityPlayerBinding
-    private val viewModel by viewModels<PlayerViewModel> {
-        PlayerViewModel.getViewModelFactory()
-    }
+    private val viewModel: PlayerViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,8 +29,10 @@ class PlayerActivity : AppCompatActivity() {
                 is SelectedTrackState.Loading -> {
                     onLoadingTrackDetails()
                 }
+
                 is SelectedTrackState.Content -> {
-                    setupTrackDetails(state.trackModel)}
+                    setupTrackDetails(state.trackModel)
+                }
             }
         }
 
@@ -75,6 +65,7 @@ class PlayerActivity : AppCompatActivity() {
     private fun preparePlayerUi() {
         binding.playedTime.setText(R.string.timer_start_time)
         binding.buttonPlay.setImageResource(R.drawable.ic_play)
+        binding.buttonPlay.isVisible = true
     }
 
     private fun setupTrackDetails(track: Track) {
@@ -85,9 +76,9 @@ class PlayerActivity : AppCompatActivity() {
         binding.yearData.text = track.releaseDate.substring(0, 4)
         binding.genreData.text = track.primaryGenreName
         binding.countryData.text = track.country
-        binding.buttonPlay.isVisible = true
 
-        Glide.with(applicationContext)
+
+        Glide.with(this)
             .load(track.artworkUrl512)
             .placeholder(R.drawable.placeholder_large)
             .centerCrop()
@@ -121,18 +112,21 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun startPlayer() {
-        viewModel.play()
         binding.buttonPlay.setImageResource(R.drawable.ic_pause)
     }
 
     private fun pausePlayer() {
-        viewModel.pause()
         binding.buttonPlay.setImageResource(R.drawable.ic_play)
 
     }
 
     override fun onPause() {
         super.onPause()
-        pausePlayer()
+        viewModel.pause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.onCleared()
     }
 }

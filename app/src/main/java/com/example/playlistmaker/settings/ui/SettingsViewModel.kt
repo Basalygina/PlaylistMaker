@@ -1,16 +1,11 @@
 package com.example.playlistmaker.settings.ui
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.lifecycle.*
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.R
-import com.example.playlistmaker.config.App
-import com.example.playlistmaker.creator.Creator
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.example.playlistmaker.settings.domain.ThemeInteractor
 
 class SettingsViewModel(private val themeInteractor: ThemeInteractor) : ViewModel() {
@@ -60,11 +55,4 @@ class SettingsViewModel(private val themeInteractor: ThemeInteractor) : ViewMode
         _intentEvent.value = Event(termsOfUseIntent)
     }
 
-    companion object {
-        fun getViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SettingsViewModel(Creator.provideThemeInteractor(context))
-            }
-        }
-    }
 }
