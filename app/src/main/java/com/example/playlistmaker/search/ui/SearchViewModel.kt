@@ -15,8 +15,8 @@ class SearchViewModel(
     private val handler: Handler
 ) : ViewModel() {
 
-    val tracks = mutableListOf<Track>()
-    val searchHistory = mutableListOf<Track>()
+    private val tracks = mutableListOf<Track>()
+    private val searchHistory = mutableListOf<Track>()
 
     private val _searchScreenState = MutableLiveData<SearchScreenState>()
     val searchScreenState: LiveData<SearchScreenState> = _searchScreenState
