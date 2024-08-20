@@ -15,22 +15,22 @@ import org.koin.dsl.module
 
 val repositoryModule = module {
 
-    single<ThemeRepository> {
+    factory<ThemeRepository> {
         ThemeRepositoryImpl(
             androidContext()
                 .getSharedPreferences(App.PM_PREFERENCES, Context.MODE_PRIVATE)
         )
     }
 
-    single<TracksRepository> {
+    factory<TracksRepository> {
         TracksRepositoryImpl(get())
     }
 
-    single<SearchHistoryRepository> {
+    factory<SearchHistoryRepository> {
         SearchHistoryRepositoryImpl(get(), get())
     }
 
-    single<SelectedTrackRepository> {
+    factory<SelectedTrackRepository> {
         SelectedTrackRepositoryImpl(get())
     }
 }
