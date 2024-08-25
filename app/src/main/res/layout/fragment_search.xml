@@ -16,10 +16,8 @@
             style="@style/ToolbarTextStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:contentInsetStart="0dp"
             android:clickable="true"
-            android:paddingStart="-8dp"
-            android:contentInsetStartWithNavigation="0dp"
-            android:navigationIcon="@drawable/ic_arrow_back_small"
             android:title="@string/search" />
 
         <FrameLayout
