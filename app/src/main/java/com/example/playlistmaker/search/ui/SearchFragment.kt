@@ -5,33 +5,40 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
-import com.example.playlistmaker.config.App.Companion.TAG
-import com.example.playlistmaker.databinding.ActivitySearchBinding
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.player.ui.PlayerActivity
 import com.example.playlistmaker.search.domain.Track
 import com.example.playlistmaker.search.domain.Track.Companion.TRACK_DATA
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
     private var isClickAllowed = true
     private lateinit var selectedTrack: Track
     private lateinit var adapter: TrackAdapter
     private lateinit var adapterSearchHistory: TrackAdapter
-    private lateinit var binding: ActivitySearchBinding
+    private lateinit var binding: FragmentSearchBinding
     private val viewModel: SearchViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentSearchBinding.inflate(layoutInflater)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         viewModel.searchScreenState.observe(this) { state ->
             when (state) {
                 SearchScreenState.Loading -> showLoading()
@@ -80,10 +87,6 @@ class SearchActivity : AppCompatActivity() {
             hideKeyboard()
         }
 
-        binding.searchToolbar.setNavigationOnClickListener {
-            onBackPressed()
-        }
-
         binding.clearHistoryButton.setOnClickListener {
             viewModel.clearSearchHistory()
             adapterSearchHistory.notifyDataSetChanged()
@@ -93,10 +96,10 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding.searchList.adapter = adapter
-        binding.searchList.layoutManager = LinearLayoutManager(this)
+        binding.searchList.layoutManager = LinearLayoutManager(requireContext())
 
         binding.searchHistoryList.adapter = adapterSearchHistory
-        binding.searchHistoryList.layoutManager = LinearLayoutManager(this)
+        binding.searchHistoryList.layoutManager = LinearLayoutManager(requireContext())
 
         binding.refreshButton.setOnClickListener {
             viewModel.searchDebounce(binding.searchEditText.text.toString())
@@ -126,6 +129,10 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
     }
 
 
@@ -178,7 +185,7 @@ class SearchActivity : AppCompatActivity() {
 
 
     private fun navigateToPlayer(trackJsonString: String) {
-        val intent = Intent(this, PlayerActivity::class.java)
+        val intent = Intent(requireContext(), PlayerActivity::class.java)
         intent.putExtra(TRACK_DATA, trackJsonString)
         startActivity(intent)
     }
@@ -212,32 +219,15 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun hideKeyboard() {
-        val currentFocusView = currentFocus
         val inputMethodManager =
-            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val currentFocusView = requireActivity().currentFocus
         if (currentFocusView != null) {
             inputMethodManager.hideSoftInputFromWindow(currentFocusView.windowToken, 0)
         }
     }
 
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString(SEARCH_TEXT, binding.searchEditText.text.toString())
-        super.onSaveInstanceState(outState)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        val restoredText = savedInstanceState.getString(SEARCH_TEXT, "")
-        binding.searchEditText.setText(restoredText)
-        viewModel.searchDebounce(restoredText)
-    }
-
-    override fun onBackPressed() {
-        binding.searchEditText.setText(EMPTY_TEXT)
-        hideUnusedViews()
-        super.onBackPressed()
-    }
 
 
     companion object {

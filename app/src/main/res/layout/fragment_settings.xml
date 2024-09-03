@@ -6,21 +6,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingStart="16dp"
-    android:paddingEnd="12dp">
+    android:paddingEnd="12dp"
+    tools:context=".settings.ui.SettingsFragment">
+
 
     <Toolbar
         android:id="@+id/settings_toolbar"
         style="@style/ToolbarTextStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:contentInsetStartWithNavigation="0dp"
-        android:navigationIcon="@drawable/ic_arrow_back_small"
+        android:clickable="false"
         android:title="@string/settings"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:contentInsetStart="0dp"
+        app:contentInsetStartWithNavigation="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/theme_container"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/theme_container"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/theme_container"
