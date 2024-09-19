@@ -54,5 +54,6 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.5.7")
     implementation("io.insert-koin:koin-android:3.3.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
 }

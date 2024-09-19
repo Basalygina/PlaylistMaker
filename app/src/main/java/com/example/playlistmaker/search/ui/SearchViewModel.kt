@@ -1,18 +1,19 @@
 package com.example.playlistmaker.search.ui
 
-import android.os.Handler
-import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.config.App.Companion.TAG
 import com.example.playlistmaker.search.domain.Track
 import com.example.playlistmaker.search.domain.TracksInteractor
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SearchViewModel(
-    private val tracksInteractor: TracksInteractor,
-    private val handler: Handler
+    private val tracksInteractor: TracksInteractor
 ) : ViewModel() {
 
     private val tracks = mutableListOf<Track>()
@@ -22,6 +23,7 @@ class SearchViewModel(
     val searchScreenState: LiveData<SearchScreenState> = _searchScreenState
 
     private val _previousSearchScreenState = MutableLiveData<SearchScreenState>()
+    private var searchJob: Job? = null
     private var latestSearchText: String? = null
 
     init {
@@ -40,40 +42,34 @@ class SearchViewModel(
         }
 
         this.latestSearchText = changedText
-        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
-        val searchRunnable = Runnable { searchRequest(changedText) }
-        val postTime = SystemClock.uptimeMillis() + SEARCH_DEBOUNCE_DELAY
-        handler.postAtTime(
-            searchRunnable,
-            SEARCH_REQUEST_TOKEN,
-            postTime
-        )
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(SEARCH_DEBOUNCE_DELAY)
+            searchRequest(changedText)
+        }
     }
 
     private fun searchRequest(query: String) {
         if (query.isNotEmpty()) {
             updateSearchScreenState(SearchScreenState.Loading)
-            tracksInteractor.searchTracks(
-                query,
-                object : TracksInteractor.TracksConsumer {
-                    override fun consume(foundTracks: List<Track>) {
-                        tracks.clear()
-                        if (foundTracks.isNotEmpty()) {
-                            tracks.addAll(foundTracks)
-                            updateSearchScreenState(SearchScreenState.Results(tracks))
-                        } else {
-                            updateSearchScreenState(SearchScreenState.NothingFound)
+            tracks.clear()
+            viewModelScope.launch {
+                try {
+                    tracksInteractor
+                        .searchTracks(query)
+                        .collect { foundTracks ->
+                            if (foundTracks.isNotEmpty()) {
+                                tracks.addAll(foundTracks)
+                                updateSearchScreenState(SearchScreenState.Results(tracks))
+                            } else {
+                                updateSearchScreenState(SearchScreenState.NothingFound)
+                            }
                         }
-
-                    }
-
-                    override fun onError(t: Throwable) {
-                        Log.e(TAG, "Ошибка: ${t.message}")
-                        tracks.clear()
-                        updateSearchScreenState(SearchScreenState.Error)
-                    }
+                } catch (t: Throwable) {
+                    Log.e(TAG, "Ошибка: ${t.message}")
+                    updateSearchScreenState(SearchScreenState.Error)
                 }
-            )
+            }
         }
 
     }
@@ -101,6 +97,8 @@ class SearchViewModel(
     }
 
     fun onTrackSelected(track: Track) {
+
+
         val trackJsonString = tracksInteractor.encodeTrackDetails(track)
         tracksInteractor.addToSearchHistory(track)
         searchHistory.clear()
@@ -109,13 +107,14 @@ class SearchViewModel(
             updateSearchScreenState(SearchScreenState.SearchHistory(searchHistory))
         }
 
-        handler.postDelayed({
+        viewModelScope.launch {
+            delay(NAVIGATE_TO_PLAYER_DELAY)
             updateSearchScreenState(SearchScreenState.NavigateToPlayer(trackJsonString))
-        }, NAVIGATE_TO_PLAYER_DELAY)
+        }
     }
 
     fun stopDelayedSearchRequest() {
-        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+        searchJob?.cancel()
     }
 
 
@@ -123,7 +122,6 @@ class SearchViewModel(
         private const val CLICK_DEBOUNCE_DELAY = 1_000L
         private const val SEARCH_DEBOUNCE_DELAY = 2_000L
         private const val NAVIGATE_TO_PLAYER_DELAY = 200L
-        private val SEARCH_REQUEST_TOKEN = Any()
     }
 
 }

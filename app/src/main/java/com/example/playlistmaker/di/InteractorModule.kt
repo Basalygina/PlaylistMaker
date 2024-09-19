@@ -15,11 +15,11 @@ val interactorModule = module {
     }
 
     factory<TracksInteractor> {
-        TracksInteractorImpl(get(), get(), get(), get())
+        TracksInteractorImpl(get(), get(), get())
     }
 
     factory<PlayerInteractor> {
-        PlayerInteractorImpl(get(), get(), get())
+        PlayerInteractorImpl(get(), get())
     }
 
 

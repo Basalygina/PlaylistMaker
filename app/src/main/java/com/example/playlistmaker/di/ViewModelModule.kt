@@ -16,11 +16,11 @@ val viewModelModule = module {
     }
 
     viewModel {
-        SearchViewModel(get(), get())
+        SearchViewModel(get())
     }
 
     viewModel {
-        PlayerViewModel(get(), get())
+        PlayerViewModel(get())
     }
 
     viewModel {(favoriteTracks: List<Track>) ->
