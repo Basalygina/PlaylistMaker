@@ -7,28 +7,13 @@ import com.example.playlistmaker.search.domain.Track
 import com.example.playlistmaker.search.ui.SearchViewModel
 import com.example.playlistmaker.settings.ui.SettingsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val viewModelModule = module {
 
-    viewModel {
-        SettingsViewModel(get())
-    }
-
-    viewModel {
-        SearchViewModel(get())
-    }
-
-    viewModel {
-        PlayerViewModel(get())
-    }
-
-    viewModel {(favoriteTracks: List<Track>) ->
-        FavoriteViewModel(favoriteTracks)
-    }
-
-    viewModel {
-        PlaylistsViewModel()
-    }
-
+    viewModelOf(::SettingsViewModel)
+    viewModelOf(::SearchViewModel)
+    viewModelOf(::PlayerViewModel)
+    viewModelOf(::PlaylistsViewModel)
 }
