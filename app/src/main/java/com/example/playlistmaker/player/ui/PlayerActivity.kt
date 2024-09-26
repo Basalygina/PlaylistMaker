@@ -33,6 +33,10 @@ class PlayerActivity : AppCompatActivity() {
                 is SelectedTrackState.Content -> {
                     setupTrackDetails(state.trackModel)
                 }
+
+                is SelectedTrackState.Error -> {
+                    binding.albumCover.setImageResource(R.drawable.error_connection)
+                }
             }
         }
 

@@ -7,4 +7,5 @@ sealed class SelectedTrackState {
     data class Content(
         val trackModel: Track,
     ): SelectedTrackState()
+    object Error: SelectedTrackState()
 }

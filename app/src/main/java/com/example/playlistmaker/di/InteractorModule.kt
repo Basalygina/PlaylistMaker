@@ -6,21 +6,14 @@ import com.example.playlistmaker.search.domain.TracksInteractor
 import com.example.playlistmaker.search.domain.TracksInteractorImpl
 import com.example.playlistmaker.settings.domain.ThemeInteractor
 import com.example.playlistmaker.settings.domain.ThemeInteractorImpl
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val interactorModule = module {
 
-    factory<ThemeInteractor> {
-        ThemeInteractorImpl(get())
-    }
-
-    factory<TracksInteractor> {
-        TracksInteractorImpl(get(), get(), get(), get())
-    }
-
-    factory<PlayerInteractor> {
-        PlayerInteractorImpl(get(), get(), get())
-    }
-
+    factoryOf(::ThemeInteractorImpl) { bind<ThemeInteractor>() }
+    factoryOf(::TracksInteractorImpl) { bind<TracksInteractor>() }
+    factoryOf(::PlayerInteractorImpl) { bind<PlayerInteractor>() }
 
 }
