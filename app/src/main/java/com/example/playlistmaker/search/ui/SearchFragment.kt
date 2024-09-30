@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,7 +51,10 @@ class SearchFragment : Fragment() {
                 SearchScreenState.Error -> showError()
                 is SearchScreenState.Results -> showResults(state.resultsList)
                 is SearchScreenState.SearchHistory -> showSearchHistory(state.searchHistoryList)
-                is SearchScreenState.NavigateToPlayer -> navigateToPlayer(state.trackJsonString)
+                is SearchScreenState.NavigateToPlayer -> navigateToPlayer(
+                    state.trackJsonString,
+                    state.navigationHandled
+                )
             }
         }
 
@@ -199,10 +203,13 @@ class SearchFragment : Fragment() {
     }
 
 
-    private fun navigateToPlayer(trackJsonString: String) {
-        val intent = Intent(requireContext(), PlayerActivity::class.java)
-        intent.putExtra(TRACK_DATA, trackJsonString)
-        startActivity(intent)
+    private fun navigateToPlayer(trackJsonString: String, navigationHandled: Boolean) {
+        if (!navigationHandled) {
+            Log.d("PMtest", "..navigateToPlayer")
+            val intent = Intent(requireContext(), PlayerActivity::class.java)
+            intent.putExtra(TRACK_DATA, trackJsonString)
+            startActivity(intent)
+        }
     }
 
     private fun clearSearchQuery() {

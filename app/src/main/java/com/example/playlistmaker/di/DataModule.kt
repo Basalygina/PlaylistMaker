@@ -5,7 +5,9 @@ import android.content.SharedPreferences
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
+import androidx.room.Room
 import com.example.playlistmaker.config.App
+import com.example.playlistmaker.mediateka.data.db.FavTracksDatabase
 import com.example.playlistmaker.player.data.MediaPlayerHandlerImpl
 import com.example.playlistmaker.player.data.PlayerHandler
 import com.example.playlistmaker.search.data.NetworkClient
@@ -21,6 +23,17 @@ import java.util.concurrent.Executors
 
 
 val dataModule = module {
+
+    single {
+        Room.databaseBuilder(
+            get(),
+            FavTracksDatabase::class.java,
+            "fav_tracks_database"
+        ).build()
+    }
+
+    single { get<FavTracksDatabase>().favDao() }
+
 
     single<NetworkClient> {
         RetrofitNetworkClient(get(), androidContext())

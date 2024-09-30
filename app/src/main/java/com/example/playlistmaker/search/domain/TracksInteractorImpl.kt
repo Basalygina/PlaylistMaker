@@ -14,14 +14,14 @@ class TracksInteractorImpl(
         repository.searchTracks(expression)
 
 
-    override fun getSearchHistory() =
+    override suspend fun getSearchHistory() =
         searchHistoryRepository.getSearchHistory()
 
-    override fun clearSearchHistory() {
+    override suspend fun clearSearchHistory() {
         searchHistoryRepository.clearSearchHistory()
     }
 
-    override fun addToSearchHistory(track: Track) {
+    override suspend fun addToSearchHistory(track: Track) {
         searchHistoryRepository.addToSearchHistory(track)
     }
 
