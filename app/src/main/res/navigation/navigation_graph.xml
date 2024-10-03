@@ -11,7 +11,11 @@
         app:enterAnim="@anim/slide_in_right"
         app:exitAnim="@anim/slide_out_left"
         app:popEnterAnim="@anim/slide_in_left"
-        app:popExitAnim="@anim/slide_out_right"/>
+        app:popExitAnim="@anim/slide_out_right">
+        <action
+            android:id="@+id/action_searchFragment_to_playerActivity"
+            app:destination="@id/playerActivity" />
+    </fragment>
     <fragment
         android:id="@+id/mediaFragment"
         android:name="com.example.playlistmaker.mediateka.ui.MediaFragment"
@@ -20,7 +24,11 @@
         app:enterAnim="@anim/slide_in_right"
         app:exitAnim="@anim/slide_out_left"
         app:popEnterAnim="@anim/slide_in_left"
-        app:popExitAnim="@anim/slide_out_right"/>
+        app:popExitAnim="@anim/slide_out_right">
+        <action
+            android:id="@+id/action_mediaFragment_to_playerActivity"
+            app:destination="@id/playerActivity" />
+    </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.playlistmaker.settings.ui.SettingsFragment"
@@ -29,4 +37,16 @@
         app:exitAnim="@anim/slide_out_left"
         app:popEnterAnim="@anim/slide_in_left"
         app:popExitAnim="@anim/slide_out_right"/>
+    <fragment
+        android:id="@+id/favoriteFragment"
+        android:name="com.example.playlistmaker.mediateka.ui.FavoriteFragment"
+        android:label="FavoriteFragment" >
+        <action
+            android:id="@+id/action_favoriteFragment_to_playerActivity"
+            app:destination="@id/playerActivity" />
+    </fragment>
+    <activity
+        android:id="@+id/playerActivity"
+        android:name="com.example.playlistmaker.player.ui.PlayerActivity"
+        android:label="PlayerActivity" />
 </navigation>

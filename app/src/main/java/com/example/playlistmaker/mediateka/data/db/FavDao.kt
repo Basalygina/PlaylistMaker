@@ -12,8 +12,8 @@ interface FavDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addToFav(track: TrackEntity)
 
-    @Delete
-    suspend fun removeFromFav(track: TrackEntity)
+    @Query("DELETE FROM fav_tracks WHERE trackId = :trackId")
+    suspend fun removeFromFav(trackId: Int)
 
     @Query("SELECT * FROM fav_tracks ORDER BY id DESC")
     fun getAllFavTracks(): Flow<List<TrackEntity>>

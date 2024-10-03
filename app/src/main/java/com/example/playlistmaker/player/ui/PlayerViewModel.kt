@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.config.App.Companion.TAG
+import com.example.playlistmaker.mediateka.domain.FavTracksInteractor
 import com.example.playlistmaker.player.domain.PlayerInteractor
 import com.example.playlistmaker.search.domain.Track
 import kotlinx.coroutines.Job
@@ -13,7 +14,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
-    private val playerInteractor: PlayerInteractor
+    private val playerInteractor: PlayerInteractor,
+    private val favTracksInteractor: FavTracksInteractor
 ) : ViewModel() {
     private var timerJob: Job? = null
 
@@ -26,11 +28,30 @@ class PlayerViewModel(
     private val _currentTime = MutableLiveData<String>()
     val currentTime: LiveData<String> = _currentTime
 
+    private var track: Track? = null
+
     fun togglePlayPause() {
         when (_playerState.value) {
             PlayerScreenState.Playing -> pause()
             else -> play()
         }
+    }
+
+    fun toggleFavorite() {
+       viewModelScope.launch {
+           track?.let { currentTrack ->
+               if (currentTrack.isFavorite == false) {
+                   favTracksInteractor.addToFav(currentTrack)
+                   favTracksInteractor.getAllFavTracks()
+                   currentTrack.isFavorite = true
+               } else {
+                   favTracksInteractor.removeFromFav(currentTrack)
+                   favTracksInteractor.getAllFavTracks()
+                   currentTrack.isFavorite = false
+               }
+               _trackState.postValue(SelectedTrackState.Content(currentTrack))
+           }
+       }
     }
 
     fun play() {
@@ -70,9 +91,16 @@ class PlayerViewModel(
         viewModelScope.launch {
             _trackState.postValue(SelectedTrackState.Loading)
             try {
-                val track = playerInteractor.getTrackDetails(trackJsonString)
-                _trackState.postValue(SelectedTrackState.Content(track))
-                preparePlayer(track)
+                track = playerInteractor.getTrackDetails(trackJsonString)
+                track?.let {
+                    if (favTracksInteractor.checkIfFav(it)){
+                        track!!.isFavorite = true
+                    }
+                    _trackState.postValue(SelectedTrackState.Content(it))
+                    preparePlayer(it)
+                } ?: run {
+                    _trackState.postValue(SelectedTrackState.Error)
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Ошибка: ${e.message}", e)
                 _trackState.postValue(SelectedTrackState.Error)
@@ -92,13 +120,14 @@ class PlayerViewModel(
         })
     }
 
+
     public override fun onCleared() {
         super.onCleared()
         playerInteractor.onDestroy()
     }
 
     companion object {
-        private const val TIMER_STEP = 300L
+        private const val TIMER_STEP = 100L
         private const val INITIAL_TIME = "0:00"
     }
 }

@@ -16,4 +16,5 @@ val viewModelModule = module {
     viewModelOf(::SearchViewModel)
     viewModelOf(::PlayerViewModel)
     viewModelOf(::PlaylistsViewModel)
+    viewModelOf(::FavoriteViewModel)
 }

@@ -1,15 +1,18 @@
 package com.example.playlistmaker.player.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
 import com.example.playlistmaker.search.domain.Track
 import com.example.playlistmaker.search.domain.Track.Companion.TRACK_DATA
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlayerActivity : AppCompatActivity() {
@@ -56,6 +59,10 @@ class PlayerActivity : AppCompatActivity() {
             viewModel.togglePlayPause()
         }
 
+        binding.buttonFavorite.setOnClickListener {
+            viewModel.toggleFavorite()
+        }
+
         binding.playerToolbar.setNavigationOnClickListener {
             onBackPressed()
         }
@@ -73,6 +80,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun setupTrackDetails(track: Track) {
+        Log.d("PMtest", "..setupTrackDetails")
         binding.trackName.text = track.trackName
         binding.artistName.text = track.artistName
         binding.trackTimeData.text = track.trackTimeString
@@ -80,6 +88,13 @@ class PlayerActivity : AppCompatActivity() {
         binding.yearData.text = track.releaseDate.substring(0, 4)
         binding.genreData.text = track.primaryGenreName
         binding.countryData.text = track.country
+        if (track.isFavorite) {
+            Log.d("PMtest", "track.isFavorite")
+            binding.buttonFavorite.setImageResource(R.drawable.ic_fav_selected)
+        }  else {
+            Log.d("PMtest", "!!track.isFavorite")
+            binding.buttonFavorite.setImageResource(R.drawable.ic_favorite)
+        }
 
 
         Glide.with(this)

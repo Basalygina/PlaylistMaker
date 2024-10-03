@@ -43,7 +43,7 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.searchScreenState.observe(this) { state ->
+        viewModel.searchScreenState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 SearchScreenState.Loading -> showLoading()
                 SearchScreenState.Prepared -> showPrepared()
