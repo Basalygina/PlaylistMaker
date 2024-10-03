@@ -1,6 +1,5 @@
 package com.example.playlistmaker.mediateka.ui
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,7 +15,6 @@ class FavoriteViewModel(private val favTracksInteractor: FavTracksInteractor) : 
 
     fun getFavTracks() {
         viewModelScope.launch {
-            Log.d("PMtest", "..getFavTracks()")
             favTracksInteractor.getAllFavTracks().collect { tracks ->
                 if (tracks.isEmpty()) updateSearchScreenState(FavScreenState.NothingInFav)
                 else updateSearchScreenState(
@@ -28,7 +26,6 @@ class FavoriteViewModel(private val favTracksInteractor: FavTracksInteractor) : 
 
     fun onTrackSelected(track: Track) {
         viewModelScope.launch {
-            Log.d("PMtest", "..onTrackSelected()")
             val trackJsonString = favTracksInteractor.encodeTrackDetails(track)
             updateSearchScreenState(FavScreenState.NavigateToPlayer(trackJsonString))
             delay(CLICK_DEBOUNCE_DELAY)
@@ -39,19 +36,7 @@ class FavoriteViewModel(private val favTracksInteractor: FavTracksInteractor) : 
     private fun updateSearchScreenState(state: FavScreenState) {
         viewModelScope.launch {
             _favScreenState.postValue(state)
-            Log.d("PMtest", "!!new state will be ${_favScreenState.value.toString()}")
         }
-
-    }
-
-    fun postLog() {
-        viewModelScope.launch {
-            while (true) {
-                Log.d("PMtest", "state is ${_favScreenState.value.toString()}")
-                delay(5000)
-            }
-        }
-
 
     }
 

@@ -38,20 +38,18 @@ class PlayerViewModel(
     }
 
     fun toggleFavorite() {
-       viewModelScope.launch {
-           track?.let { currentTrack ->
-               if (currentTrack.isFavorite == false) {
-                   favTracksInteractor.addToFav(currentTrack)
-                   favTracksInteractor.getAllFavTracks()
-                   currentTrack.isFavorite = true
-               } else {
-                   favTracksInteractor.removeFromFav(currentTrack)
-                   favTracksInteractor.getAllFavTracks()
-                   currentTrack.isFavorite = false
-               }
-               _trackState.postValue(SelectedTrackState.Content(currentTrack))
-           }
-       }
+        viewModelScope.launch {
+            track?.let { currentTrack ->
+                if (currentTrack.isFavorite == false) {
+                    favTracksInteractor.addToFav(currentTrack)
+                    currentTrack.isFavorite = true
+                } else {
+                    favTracksInteractor.removeFromFav(currentTrack)
+                    currentTrack.isFavorite = false
+                }
+                _trackState.postValue(SelectedTrackState.Content(currentTrack))
+            }
+        }
     }
 
     fun play() {
@@ -93,7 +91,7 @@ class PlayerViewModel(
             try {
                 track = playerInteractor.getTrackDetails(trackJsonString)
                 track?.let {
-                    if (favTracksInteractor.checkIfFav(it)){
+                    if (favTracksInteractor.checkIfFav(it)) {
                         track!!.isFavorite = true
                     }
                     _trackState.postValue(SelectedTrackState.Content(it))

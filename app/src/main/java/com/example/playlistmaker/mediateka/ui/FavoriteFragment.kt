@@ -2,7 +2,6 @@ package com.example.playlistmaker.mediateka.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,8 +37,6 @@ class FavoriteFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d("PMtest", ".onViewCreated)")
-viewModel.postLog()
         viewModel.getFavTracks()
         viewModel.favScreenState.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -60,13 +57,11 @@ viewModel.postLog()
     }
 
     private fun selectTrack(track: Track) {
-        Log.d("PMtest", "..selectTrack")
         viewModel.onTrackSelected(track)
 
     }
 
     private fun clickDebounce(): Boolean {
-        Log.d("PMtest", "..clickDebounce")
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
@@ -79,7 +74,6 @@ viewModel.postLog()
     }
 
     private fun showFavTracks(favoriteTracks: List<Track>) {
-        Log.d("PMtest", "..showFavTracks")
         binding.favNothingImage.isVisible = false
         binding.favNothingLabel.isVisible = false
         binding.favoriteList.isVisible = true
@@ -87,7 +81,6 @@ viewModel.postLog()
     }
 
     private fun showEmpty() {
-        Log.d("PMtest", "..showEmpty")
         binding.favNothingImage.isVisible = true
         binding.favNothingLabel.isVisible = true
         binding.favoriteList.isVisible = false
@@ -96,11 +89,15 @@ viewModel.postLog()
 
     private fun navigateToPlayer(trackJsonString: String, navigationHandled: Boolean) {
         if (!navigationHandled) {
-            Log.d("PMtest", "..navigateToPlayer")
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.putExtra(TRACK_DATA, trackJsonString)
             startActivity(intent)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getFavTracks()
     }
 
     companion object {
