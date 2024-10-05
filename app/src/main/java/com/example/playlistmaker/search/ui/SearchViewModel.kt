@@ -11,6 +11,7 @@ import com.example.playlistmaker.search.domain.TracksInteractor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 
 class SearchViewModel(
     private val tracksInteractor: TracksInteractor
@@ -22,19 +23,26 @@ class SearchViewModel(
     private val _searchScreenState = MutableLiveData<SearchScreenState>()
     val searchScreenState: LiveData<SearchScreenState> = _searchScreenState
 
-    private val _previousSearchScreenState = MutableLiveData<SearchScreenState>()
+    private var modeSearchHistory = true
     private var searchJob: Job? = null
     private var latestSearchText: String? = null
 
     init {
-        searchHistory.clear()
-        searchHistory.addAll(tracksInteractor.getSearchHistory())
+        showInitialSearchHistory()
+    }
+
+    private fun showInitialSearchHistory() {
+        viewModelScope.launch {
+            searchHistory.clear()
+            searchHistory.addAll(tracksInteractor.getSearchHistory())
+        }
         if (searchHistory.isNotEmpty()) {
             updateSearchScreenState(SearchScreenState.SearchHistory(searchHistory))
         } else {
             updateSearchScreenState(SearchScreenState.Prepared)
         }
     }
+
 
     fun searchDebounce(changedText: String) {
         if (latestSearchText == changedText) {
@@ -52,6 +60,7 @@ class SearchViewModel(
     private fun searchRequest(query: String) {
         if (query.isNotEmpty()) {
             updateSearchScreenState(SearchScreenState.Loading)
+            modeSearchHistory = false
             tracks.clear()
             viewModelScope.launch {
                 try {
@@ -76,40 +85,51 @@ class SearchViewModel(
 
 
     private fun updateSearchScreenState(state: SearchScreenState) {
-        _previousSearchScreenState.postValue(_searchScreenState.value)
-        _searchScreenState.postValue(state)
+        if (state is SearchScreenState.SearchHistory) {
+            modeSearchHistory = true
+        }
+        viewModelScope.launch {
+            _searchScreenState.postValue(state)
+        }
+
     }
 
 
     fun clearSearchHistory() {
-        tracksInteractor.clearSearchHistory()
-        updateSearchScreenState(SearchScreenState.Prepared)
-    }
-
-    fun getSearchHistory() {
-        searchHistory.clear()
-        searchHistory.addAll(tracksInteractor.getSearchHistory())
-        if (searchHistory.isNotEmpty()) {
-            updateSearchScreenState(SearchScreenState.SearchHistory(searchHistory))
-        } else {
+        viewModelScope.launch {
+            tracksInteractor.clearSearchHistory()
             updateSearchScreenState(SearchScreenState.Prepared)
         }
     }
 
-    fun onTrackSelected(track: Track) {
-
-
-        val trackJsonString = tracksInteractor.encodeTrackDetails(track)
-        tracksInteractor.addToSearchHistory(track)
-        searchHistory.clear()
-        searchHistory.addAll(tracksInteractor.getSearchHistory())
-        if (_previousSearchScreenState.value is SearchScreenState.SearchHistory || _searchScreenState.value is SearchScreenState.SearchHistory) {
-            updateSearchScreenState(SearchScreenState.SearchHistory(searchHistory))
-        }
-
+    fun getSearchHistory() {
         viewModelScope.launch {
-            delay(NAVIGATE_TO_PLAYER_DELAY)
+            searchHistory.clear()
+            searchHistory.addAll(tracksInteractor.getSearchHistory())
+            if (searchHistory.isNotEmpty()) {
+                updateSearchScreenState(SearchScreenState.SearchHistory(searchHistory))
+            } else {
+                updateSearchScreenState(SearchScreenState.Prepared)
+            }
+        }
+    }
+
+    fun onTrackSelected(track: Track) {
+        viewModelScope.launch {
+            val trackJsonString = tracksInteractor.encodeTrackDetails(track)
+            val reorderHistoryJob = launch {
+                tracksInteractor.addToSearchHistory(track)
+                searchHistory.clear()
+                searchHistory.addAll(tracksInteractor.getSearchHistory())
+                if (modeSearchHistory) {
+                    updateSearchScreenState(SearchScreenState.SearchHistory(searchHistory))
+                }
+            }
+            reorderHistoryJob.join()
+            yield()
             updateSearchScreenState(SearchScreenState.NavigateToPlayer(trackJsonString))
+            delay(CLICK_DEBOUNCE_DELAY)
+            updateSearchScreenState(SearchScreenState.NavigateToPlayer(trackJsonString, true))
         }
     }
 
@@ -117,12 +137,9 @@ class SearchViewModel(
         searchJob?.cancel()
     }
 
-
     companion object {
-        private const val CLICK_DEBOUNCE_DELAY = 1_000L
+        private const val CLICK_DEBOUNCE_DELAY = 100L
         private const val SEARCH_DEBOUNCE_DELAY = 2_000L
-        private const val NAVIGATE_TO_PLAYER_DELAY = 200L
     }
 
 }
-

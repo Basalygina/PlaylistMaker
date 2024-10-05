@@ -56,6 +56,10 @@ class PlayerActivity : AppCompatActivity() {
             viewModel.togglePlayPause()
         }
 
+        binding.buttonFavorite.setOnClickListener {
+            viewModel.toggleFavorite()
+        }
+
         binding.playerToolbar.setNavigationOnClickListener {
             onBackPressed()
         }
@@ -64,12 +68,16 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun onLoadingTrackDetails() {
         binding.buttonPlay.isVisible = false
+        binding.buttonFavorite.isVisible = false
+        binding.buttonQueue.isVisible = false
     }
 
     private fun preparePlayerUi() {
         binding.playedTime.setText(R.string.timer_start_time)
         binding.buttonPlay.setImageResource(R.drawable.ic_play)
         binding.buttonPlay.isVisible = true
+        binding.buttonFavorite.isVisible = true
+        binding.buttonQueue.isVisible = true
     }
 
     private fun setupTrackDetails(track: Track) {
@@ -80,6 +88,11 @@ class PlayerActivity : AppCompatActivity() {
         binding.yearData.text = track.releaseDate.substring(0, 4)
         binding.genreData.text = track.primaryGenreName
         binding.countryData.text = track.country
+        if (track.isFavorite) {
+            binding.buttonFavorite.setImageResource(R.drawable.ic_fav_selected)
+        } else {
+            binding.buttonFavorite.setImageResource(R.drawable.ic_favorite)
+        }
 
 
         Glide.with(this)

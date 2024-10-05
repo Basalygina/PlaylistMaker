@@ -42,7 +42,7 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.searchScreenState.observe(this) { state ->
+        viewModel.searchScreenState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 SearchScreenState.Loading -> showLoading()
                 SearchScreenState.Prepared -> showPrepared()
@@ -50,7 +50,10 @@ class SearchFragment : Fragment() {
                 SearchScreenState.Error -> showError()
                 is SearchScreenState.Results -> showResults(state.resultsList)
                 is SearchScreenState.SearchHistory -> showSearchHistory(state.searchHistoryList)
-                is SearchScreenState.NavigateToPlayer -> navigateToPlayer(state.trackJsonString)
+                is SearchScreenState.NavigateToPlayer -> navigateToPlayer(
+                    state.trackJsonString,
+                    state.navigationHandled
+                )
             }
         }
 
@@ -199,10 +202,12 @@ class SearchFragment : Fragment() {
     }
 
 
-    private fun navigateToPlayer(trackJsonString: String) {
-        val intent = Intent(requireContext(), PlayerActivity::class.java)
-        intent.putExtra(TRACK_DATA, trackJsonString)
-        startActivity(intent)
+    private fun navigateToPlayer(trackJsonString: String, navigationHandled: Boolean) {
+        if (!navigationHandled) {
+            val intent = Intent(requireContext(), PlayerActivity::class.java)
+            intent.putExtra(TRACK_DATA, trackJsonString)
+            startActivity(intent)
+        }
     }
 
     private fun clearSearchQuery() {

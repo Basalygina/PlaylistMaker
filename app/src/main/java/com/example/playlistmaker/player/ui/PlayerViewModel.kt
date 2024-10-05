@@ -1,19 +1,23 @@
 package com.example.playlistmaker.player.ui
 
-import android.os.Handler
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.config.App.Companion.TAG
+import com.example.playlistmaker.mediateka.domain.FavTracksInteractor
 import com.example.playlistmaker.player.domain.PlayerInteractor
 import com.example.playlistmaker.search.domain.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class PlayerViewModel(
     private val playerInteractor: PlayerInteractor,
-    private val mainHandler: Handler
+    private val favTracksInteractor: FavTracksInteractor
 ) : ViewModel() {
-    private var timerRunnable: Runnable? = null
+    private var timerJob: Job? = null
 
     private val _playerState = MutableLiveData<PlayerScreenState>()
     val playerState: LiveData<PlayerScreenState> = _playerState
@@ -24,10 +28,27 @@ class PlayerViewModel(
     private val _currentTime = MutableLiveData<String>()
     val currentTime: LiveData<String> = _currentTime
 
+    private var track: Track? = null
+
     fun togglePlayPause() {
         when (_playerState.value) {
             PlayerScreenState.Playing -> pause()
             else -> play()
+        }
+    }
+
+    fun toggleFavorite() {
+        viewModelScope.launch {
+            track?.let { currentTrack ->
+                if (currentTrack.isFavorite == false) {
+                    favTracksInteractor.addToFav(currentTrack)
+                    currentTrack.isFavorite = true
+                } else {
+                    favTracksInteractor.removeFromFav(currentTrack)
+                    currentTrack.isFavorite = false
+                }
+                _trackState.postValue(SelectedTrackState.Content(currentTrack))
+            }
         }
     }
 
@@ -44,50 +65,45 @@ class PlayerViewModel(
 
 
     private fun updatePlayedTime() {
-        timerRunnable = object : Runnable {
-            override fun run() {
-                if (_playerState.value == PlayerScreenState.Playing) {
-                    _currentTime.value = playerInteractor.getCurrentPosition()
-                    mainHandler.postDelayed(this, TIMER_STEP / 2)
-                }
+        timerJob = viewModelScope.launch {
+            while (_playerState.value == PlayerScreenState.Playing) {
+                delay(TIMER_STEP)
+                _currentTime.value = playerInteractor.getCurrentPosition()
+            }
+            if (_playerState.value == PlayerScreenState.Prepared) {
+                _currentTime.value = INITIAL_TIME
             }
         }
-        mainHandler.post(timerRunnable!!)
     }
 
-    private fun stopUpdaitingTime() {
-        timerRunnable?.let { mainHandler.removeCallbacks(it) }
-    }
 
     fun pause() {
         if (_playerState.value != PlayerScreenState.Paused) {
             playerInteractor.pausePlayer()
             _playerState.value = PlayerScreenState.Paused
-            stopUpdaitingTime()
         }
     }
 
 
     fun setCurrentTrack(trackJsonString: String) {
-        _trackState.postValue(SelectedTrackState.Loading)
-        playerInteractor.getTrackDetails(trackJsonString, object : PlayerInteractor.TrackConsumer {
-            override fun consume(track: Track) {
-                mainHandler.post {
-                    try {
-                        _trackState.postValue(SelectedTrackState.Content(track))
-                        preparePlayer(track)
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error in consume method", e)
+        viewModelScope.launch {
+            _trackState.postValue(SelectedTrackState.Loading)
+            try {
+                track = playerInteractor.getTrackDetails(trackJsonString)
+                track?.let {
+                    if (favTracksInteractor.checkIfFav(it)) {
+                        track!!.isFavorite = true
                     }
+                    _trackState.postValue(SelectedTrackState.Content(it))
+                    preparePlayer(it)
+                } ?: run {
+                    _trackState.postValue(SelectedTrackState.Error)
                 }
+            } catch (e: Exception) {
+                Log.e(TAG, "Ошибка: ${e.message}", e)
+                _trackState.postValue(SelectedTrackState.Error)
             }
-
-            override fun onError(t: Throwable) {
-                mainHandler.post {
-                    Log.e(TAG, "Ошибка: ${t.message}", t)
-                }
-            }
-        })
+        }
     }
 
     private fun preparePlayer(track: Track) {
@@ -102,13 +118,14 @@ class PlayerViewModel(
         })
     }
 
+
     public override fun onCleared() {
         super.onCleared()
-        stopUpdaitingTime()
         playerInteractor.onDestroy()
     }
 
     companion object {
-        private const val TIMER_STEP = 1_000L
+        private const val TIMER_STEP = 100L
+        private const val INITIAL_TIME = "0:00"
     }
 }

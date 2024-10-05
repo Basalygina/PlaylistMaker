@@ -8,9 +8,9 @@ interface TracksInteractor {
 
     fun searchTracks (expression: String): Flow<MutableList<Track>>
 
-    fun getSearchHistory(): MutableList<Track>
-    fun clearSearchHistory()
-    fun addToSearchHistory(track: Track)
+    suspend fun getSearchHistory(): MutableList<Track>
+    suspend fun clearSearchHistory()
+    suspend fun addToSearchHistory(track: Track)
     fun encodeTrackDetails(track: Track): String
 
 }

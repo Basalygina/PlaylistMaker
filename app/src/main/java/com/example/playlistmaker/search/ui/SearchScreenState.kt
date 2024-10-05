@@ -9,5 +9,5 @@ sealed class SearchScreenState {
     object Error: SearchScreenState()
     data class Results(val resultsList: List<Track>): SearchScreenState()
     data class SearchHistory(val searchHistoryList: List<Track>): SearchScreenState()
-    data class NavigateToPlayer(val trackJsonString: String) : SearchScreenState()
+    data class NavigateToPlayer(val trackJsonString: String, val navigationHandled: Boolean = false) : SearchScreenState()
 }
