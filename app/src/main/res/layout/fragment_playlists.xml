@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/new_playlist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginVertical="@dimen/margin_vertical"
+        android:layout_marginTop="@dimen/margin_vertical"
         android:background="@drawable/rounded_button_long"
         android:clickable="true"
         android:fontFamily="@font/ys_display_medium"
@@ -19,33 +19,48 @@
         android:textColor="@color/primary_background_color"
         android:textFontWeight="500"
         android:textSize="14sp"
-        android:layout_marginTop="@dimen/margin_vertical"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/playlist_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/new_playlist"
+        app:spanCount="2"
+        tools:listitem="@layout/grid_playlist" />
+
 
     <ImageView
         android:id="@+id/playlists_nothing_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/new_playlist"
         android:layout_marginTop="46dp"
-        android:src="@drawable/nothing_found" />
+        android:src="@drawable/nothing_found"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/new_playlist" />
 
     <TextView
+        android:id="@+id/playlists_nothing_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/playlists_is_empty"
-        app:layout_constraintTop_toBottomOf="@id/playlists_nothing_image"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:fontFamily="@font/ys_display_medium"
-        android:textSize="@dimen/error_text_size"
         android:layout_marginTop="16dp"
+        android:fontFamily="@font/ys_display_medium"
+        android:gravity="center"
+        android:text="@string/playlists_is_empty"
         android:textColor="@color/primary_text_color"
-        android:gravity="center"/>
+        android:textSize="@dimen/large_text_size"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/playlists_nothing_image" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

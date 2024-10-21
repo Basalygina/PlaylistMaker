@@ -1,20 +1,30 @@
 package com.example.playlistmaker.player.ui
 
 import android.os.Bundle
+import android.view.Gravity
+import android.view.View
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
+import com.example.playlistmaker.mediateka.ui.playlists.CreatePlaylistFragment
 import com.example.playlistmaker.search.domain.Track
 import com.example.playlistmaker.search.domain.Track.Companion.TRACK_DATA
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlayerActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityPlayerBinding
     private val viewModel: PlayerViewModel by viewModel()
+    private lateinit var binding: ActivityPlayerBinding
+    private lateinit var adapter: PlaylistAdapterBottom
+    private lateinit var currentTrack: Track
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +42,7 @@ class PlayerActivity : AppCompatActivity() {
 
                 is SelectedTrackState.Content -> {
                     setupTrackDetails(state.trackModel)
+                    getPlaylists()
                 }
 
                 is SelectedTrackState.Error -> {
@@ -52,6 +63,10 @@ class PlayerActivity : AppCompatActivity() {
             binding.playedTime.text = time
         }
 
+        viewModel.playlists.observe(this) { playlists ->
+            adapter.updatePlaylists(playlists)
+        }
+
         binding.buttonPlay.setOnClickListener {
             viewModel.togglePlayPause()
         }
@@ -63,13 +78,87 @@ class PlayerActivity : AppCompatActivity() {
         binding.playerToolbar.setNavigationOnClickListener {
             onBackPressed()
         }
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetContainer).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
+        binding.buttonAddToPlaylist.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
 
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        binding.overlay.visibility = View.GONE
+                    }
+
+                    else -> {
+                        binding.overlay.visibility = View.VISIBLE
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                binding.overlay.alpha = slideOffset
+            }
+        })
+
+        adapter = PlaylistAdapterBottom(mutableListOf()) { playlist ->
+            val isAdded = viewModel.addToPlaylist(currentTrack, playlist)
+            showCustomToast(
+                getString(
+                    when (isAdded) {
+                        true -> R.string.added_to_playlist
+                        false -> R.string.already_added_to_playlist
+                    },
+                    playlist.playlistName
+                )
+            )
+            viewModel.getAllPlaylists()
+            if (isAdded) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+        binding.playlistRecycler.adapter = adapter
+
+
+
+        binding.newPlaylist.setOnClickListener {
+            binding.playerFragmentContainer.isVisible = true
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.player_fragment_container, CreatePlaylistFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+
+    }
+
+    private fun showCustomToast(message: String) {
+        val layout = layoutInflater.inflate(R.layout.playlist_toast, null)
+        val toastTextView = layout.findViewById<TextView>(R.id.toast_text)
+        toastTextView.text = message
+
+        Toast(this)
+            .apply {
+                duration = Toast.LENGTH_SHORT
+                view = layout
+                setGravity(Gravity.FILL_HORIZONTAL or Gravity.BOTTOM, 0, 100)
+            }
+            .show()
+    }
+
+    private fun getPlaylists() {
+        lifecycleScope.launch {
+            viewModel.getAllPlaylists()
+        }
     }
 
     private fun onLoadingTrackDetails() {
         binding.buttonPlay.isVisible = false
         binding.buttonFavorite.isVisible = false
-        binding.buttonQueue.isVisible = false
+        binding.buttonAddToPlaylist.isVisible = false
     }
 
     private fun preparePlayerUi() {
@@ -77,10 +166,11 @@ class PlayerActivity : AppCompatActivity() {
         binding.buttonPlay.setImageResource(R.drawable.ic_play)
         binding.buttonPlay.isVisible = true
         binding.buttonFavorite.isVisible = true
-        binding.buttonQueue.isVisible = true
+        binding.buttonAddToPlaylist.isVisible = true
     }
 
     private fun setupTrackDetails(track: Track) {
+        currentTrack = track
         binding.trackName.text = track.trackName
         binding.artistName.text = track.artistName
         binding.trackTimeData.text = track.trackTimeString
@@ -93,8 +183,6 @@ class PlayerActivity : AppCompatActivity() {
         } else {
             binding.buttonFavorite.setImageResource(R.drawable.ic_favorite)
         }
-
-
         Glide.with(this)
             .load(track.artworkUrl512)
             .placeholder(R.drawable.placeholder_large)

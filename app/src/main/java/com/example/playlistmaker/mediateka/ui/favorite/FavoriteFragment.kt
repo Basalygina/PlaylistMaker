@@ -1,4 +1,4 @@
-package com.example.playlistmaker.mediateka.ui
+package com.example.playlistmaker.mediateka.ui.favorite
 
 import android.content.Intent
 import android.os.Bundle

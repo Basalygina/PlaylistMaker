@@ -7,6 +7,6 @@
 
     <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker">
         <item name="colorControlNormal">@color/color_red</item>
-        <item name="colorControlActivated">@color/bottom_nav_tint_color</item>
+        <item name="colorControlActivated">@color/color_blue</item>
     </style>
 </resources>
