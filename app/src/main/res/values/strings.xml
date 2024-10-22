@@ -46,6 +46,9 @@
     <string name="playlist_name_is_taken">Плейлист %s уже существует</string>
     <string name="added_to_playlist">Добавлено в плейлист %s</string>
     <string name="already_added_to_playlist">Трек уже добавлен в плейлист %s</string>
+    <string name="playlist_duration">0 минут</string>
+    <string name="playlist_tracks_count">0 треков</string>
+
 
 
 </resources>
