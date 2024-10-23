@@ -22,7 +22,6 @@ class SearchViewModel(
 
     private val _searchScreenState = MutableLiveData<SearchScreenState>()
     val searchScreenState: LiveData<SearchScreenState> = _searchScreenState
-
     private var modeSearchHistory = true
     private var searchJob: Job? = null
     private var latestSearchText: String? = null

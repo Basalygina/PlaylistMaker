@@ -48,7 +48,7 @@
     <style name="PlayTrackPropetriesData">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/search_icon_tint_reverse</item>
+        <item name="android:textColor">@color/color_tint_reverse</item>
         <item name="android:textSize">13sp</item>
         <item name="fontFamily">@font/ys_display_regular</item>
         <item name="android:ellipsize">end</item>

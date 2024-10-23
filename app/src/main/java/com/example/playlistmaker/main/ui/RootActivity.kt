@@ -2,6 +2,7 @@ package com.example.playlistmaker.main.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
@@ -11,7 +12,7 @@ import com.example.playlistmaker.databinding.ActivityRootBinding
 import com.example.playlistmaker.mediateka.ui.MediaFragment
 
 class RootActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityRootBinding
+    lateinit var binding: ActivityRootBinding
     private var currentTabId: Int = R.id.mediaFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {

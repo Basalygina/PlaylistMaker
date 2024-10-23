@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.config.App.Companion.TAG
 import com.example.playlistmaker.mediateka.domain.FavTracksInteractor
+import com.example.playlistmaker.mediateka.domain.Playlist
+import com.example.playlistmaker.mediateka.domain.PlaylistInteractor
 import com.example.playlistmaker.player.domain.PlayerInteractor
 import com.example.playlistmaker.search.domain.Track
 import kotlinx.coroutines.Job
@@ -15,7 +17,8 @@ import kotlinx.coroutines.launch
 
 class PlayerViewModel(
     private val playerInteractor: PlayerInteractor,
-    private val favTracksInteractor: FavTracksInteractor
+    private val favTracksInteractor: FavTracksInteractor,
+    private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
     private var timerJob: Job? = null
 
@@ -27,6 +30,9 @@ class PlayerViewModel(
 
     private val _currentTime = MutableLiveData<String>()
     val currentTime: LiveData<String> = _currentTime
+
+    private val _playlists = MutableLiveData<MutableList<Playlist>>()
+    val playlists: LiveData<MutableList<Playlist>> = _playlists
 
     private var track: Track? = null
 
@@ -122,6 +128,27 @@ class PlayerViewModel(
     public override fun onCleared() {
         super.onCleared()
         playerInteractor.onDestroy()
+    }
+
+    fun addToPlaylist(track: Track, playlist: Playlist): Boolean {
+        if (playlist.containsTrack(track.trackId)) {
+            return false
+        } else {
+            viewModelScope.launch {
+                playlistInteractor.updatePlaylist(playlist, track)
+            }
+            return true
+        }
+    }
+
+    fun getAllPlaylists() {
+        viewModelScope.launch {
+            playlistInteractor.getAllPlaylists().collect { playlists ->
+                val currentPlaylists = mutableListOf<Playlist>()
+                currentPlaylists.addAll(playlists)
+                _playlists.postValue(currentPlaylists)
+            }
+        }
     }
 
     companion object {

@@ -5,6 +5,8 @@
     <color name="color_red">#FF0000</color>
     <color name="color_light_red">#F56B6C</color>
     <color name="color_grey">#AEAFB4</color>
+    <color name="color_light_grey">#E6E8EB</color>
+    <color name="color_tint_reverse">@color/color_white</color>
     <color name="main_screen_button_text_color">@color/color_black</color>
     <color name="primary_text_color">@color/color_white</color>
     <color name="primary_icon_tint">@color/color_white</color>
@@ -20,8 +22,8 @@
     <color name="search_screen_text_color">@color/color_black</color>
     <color name="search_track_title">@color/color_white</color>
     <color name="search_track_attributes">@color/color_white</color>
-    <color name="search_icon_tint_reverse">@color/color_white</color>
     <color name="progress_bar_tint">#5965e1</color>
-    <color name="bottom_nav_tint_color">#3772E7</color>
-    <color name="border_tint">#E6E8EB</color>
+    <color name="color_blue">#3772E7</color>
+    <color name="border_tint">@color/color_light_grey</color>
+    <color name="playlist_attributes">@color/color_white</color>
 </resources>

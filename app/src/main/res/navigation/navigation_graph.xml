@@ -39,7 +39,7 @@
         app:popExitAnim="@anim/slide_out_right"/>
     <fragment
         android:id="@+id/favoriteFragment"
-        android:name="com.example.playlistmaker.mediateka.ui.FavoriteFragment"
+        android:name="com.example.playlistmaker.mediateka.ui.favorite.FavoriteFragment"
         android:label="FavoriteFragment" >
         <action
             android:id="@+id/action_favoriteFragment_to_playerActivity"
@@ -49,4 +49,16 @@
         android:id="@+id/playerActivity"
         android:name="com.example.playlistmaker.player.ui.PlayerActivity"
         android:label="PlayerActivity" />
+    <fragment
+        android:id="@+id/playlistsFragment"
+        android:name="com.example.playlistmaker.mediateka.ui.playlists.PlaylistsFragment"
+        android:label="PlaylistsFragment" >
+        <action
+            android:id="@+id/action_playlistsFragment_to_createPlaylistFragment"
+            app:destination="@id/createPlaylistFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createPlaylistFragment"
+        android:name="com.example.playlistmaker.mediateka.ui.playlists.CreatePlaylistFragment"
+        android:label="CreatePlaylistFragment" />
 </navigation>
