@@ -22,11 +22,11 @@
         android:clickable="true"
         android:contentInsetStart="0dp"
         android:contentInsetStartWithNavigation="0dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:navigationIcon="@drawable/ic_arrow_back"
+        android:title="@string/new_playlist"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:navigationIcon="@drawable/ic_arrow_back"
-        android:title="@string/new_playlist" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/playlist_cover"
@@ -59,6 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:ellipsize="end"
             android:fontFamily="@font/ys_display_regular"
             android:hint="@string/playlist_name"
             android:inputType="text"
@@ -81,8 +82,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:ellipsize="end"
             android:fontFamily="@font/ys_display_regular"
-
             android:hint="@string/playlist_description"
             android:inputType="text"
             android:maxLines="3"

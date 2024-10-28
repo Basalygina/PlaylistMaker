@@ -135,7 +135,7 @@ class PlayerViewModel(
             return false
         } else {
             viewModelScope.launch {
-                playlistInteractor.updatePlaylist(playlist, track)
+                playlistInteractor.updateTracksInPlaylist(playlist.playlistName, track, isAdding = true)
             }
             return true
         }

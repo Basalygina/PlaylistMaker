@@ -49,9 +49,9 @@ class FavoriteFragment : Fragment() {
 
             }
         }
-        adapter = TrackAdapter(mutableListOf()) {
+        adapter = TrackAdapter(mutableListOf(), {
             if (clickDebounce()) selectTrack(it)
-        }
+        })
         binding.favoriteList.adapter = adapter
         binding.favoriteList.layoutManager = LinearLayoutManager(requireContext())
     }

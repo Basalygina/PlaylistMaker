@@ -4,8 +4,10 @@ import android.content.Context
 import com.example.playlistmaker.config.App
 import com.example.playlistmaker.mediateka.data.FavTracksRepositoryImpl
 import com.example.playlistmaker.mediateka.data.PlaylistRepositoryImpl
+import com.example.playlistmaker.mediateka.data.TrackInPlaylistRepositoryImpl
 import com.example.playlistmaker.mediateka.domain.FavTracksRepository
 import com.example.playlistmaker.mediateka.domain.PlaylistRepository
+import com.example.playlistmaker.mediateka.domain.TrackInPlaylistRepository
 import com.example.playlistmaker.player.data.SelectedTrackRepositoryImpl
 import com.example.playlistmaker.player.domain.SelectedTrackRepository
 import com.example.playlistmaker.search.data.SearchHistoryRepositoryImpl
@@ -31,6 +33,7 @@ val repositoryModule = module {
 
     single { FavTracksRepositoryImpl(get()) } bind FavTracksRepository::class
     single { PlaylistRepositoryImpl(get()) } bind PlaylistRepository::class
+    single { TrackInPlaylistRepositoryImpl(get()) } bind TrackInPlaylistRepository::class
 
     factoryOf(::TracksRepositoryImpl) { bind<TracksRepository>() }
     factoryOf(::SearchHistoryRepositoryImpl) { bind<SearchHistoryRepository>() }

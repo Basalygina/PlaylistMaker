@@ -1,14 +1,13 @@
 package com.example.playlistmaker.mediateka.data.db
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface FavDao {
+interface DaoFav {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addToFav(track: TrackEntity)
 

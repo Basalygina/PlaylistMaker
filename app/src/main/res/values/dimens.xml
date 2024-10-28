@@ -18,7 +18,7 @@
     <dimen name="margin_horizontal">12dp</dimen>
     <dimen name="margin_vertical">24dp</dimen>
     <dimen name="settings_text_margin_vertical">22dp</dimen>
-    <dimen name="search_header_margin_vertical">12dp</dimen>
+    <dimen name="header_margin_vertical">12dp</dimen>
     <dimen name="albom_cover_height">45dp</dimen>
 
 </resources>

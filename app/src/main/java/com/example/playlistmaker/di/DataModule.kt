@@ -31,8 +31,8 @@ val dataModule = module {
             .build()
     }
 
-    single { get<PlaylistDatabase>().favDao() }
-    single { get<PlaylistDatabase>().playlistDao() }
+    single { get<PlaylistDatabase>().daoFav() }
+    single { get<PlaylistDatabase>().daoPlaylist() }
 
     single<NetworkClient> {
         RetrofitNetworkClient(get(), androidContext())

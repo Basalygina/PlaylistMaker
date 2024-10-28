@@ -8,10 +8,15 @@ data class Playlist(
     val cover: String?, // Путь к файлу обложки
     val tracks: String = "", // Список идентификаторов треков
     val tracksCount: Int = 0, // Количество треков
+    val durationSum: Long = 0L //Общая длительность треков в миллисекундах
 ) : Serializable {
 
     fun containsTrack(trackId: Int): Boolean {
         return tracks.split(",").map { it.trim() }.contains(trackId.toString())
+    }
+
+    companion object{
+        const val ARG_PLAYLIST_NAME = "playlist_name"
     }
 
 }

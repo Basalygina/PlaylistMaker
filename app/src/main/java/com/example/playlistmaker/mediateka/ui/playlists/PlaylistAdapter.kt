@@ -7,7 +7,8 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.mediateka.domain.Playlist
 
 class PlaylistAdapter(
-    private val playlists: MutableList<Playlist>
+    private val playlists: MutableList<Playlist>,
+    private val clickListener: PlaylistClickListener
 ) : RecyclerView.Adapter<PlaylistViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
         val view =
@@ -19,6 +20,7 @@ class PlaylistAdapter(
 
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
         holder.bind(playlists[position])
+        holder.itemView.setOnClickListener { clickListener.onPlaylistClick(playlists.get(position)) }
     }
 
     fun updatePlaylists(newPlaylists: List<Playlist>) {
@@ -26,4 +28,8 @@ class PlaylistAdapter(
         playlists.addAll(newPlaylists)
         notifyDataSetChanged()
     }
+}
+
+fun interface PlaylistClickListener {
+    fun onPlaylistClick(playlist: Playlist)
 }
