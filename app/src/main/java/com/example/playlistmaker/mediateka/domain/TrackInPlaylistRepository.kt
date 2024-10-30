@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface TrackInPlaylistRepository {
     fun fetchTracksByIds(trackIds: List<Int>): Flow<List<Track>>
     suspend fun addTrackInDatabase(track: Track)
-    suspend fun removeTrackFromDatabase(trackId: Int)
+    suspend fun removeTrackFromDatabase(trackId: Int, playlistName: String)
 }

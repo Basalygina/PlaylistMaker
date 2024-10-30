@@ -1,5 +1,6 @@
 package com.example.playlistmaker.mediateka.data
 
+import android.util.Log
 import com.example.playlistmaker.mediateka.data.PlaylistDbMapper.toPlaylist
 import com.example.playlistmaker.mediateka.data.PlaylistDbMapper.toPlaylistEntity
 import com.example.playlistmaker.mediateka.data.db.PlaylistDatabase
@@ -29,10 +30,9 @@ class PlaylistRepositoryImpl(val playlistDatabase: PlaylistDatabase) : PlaylistR
         val playlist = playlistDatabase.daoPlaylist().getPlaylistDetails(playlistName)
         val tracksList = PlaylistDbMapper.toTracksList(playlist.tracks).toMutableList()
         if (isAdding) tracksList.add(track.trackId) else tracksList.remove(track.trackId)
-
         val updatedTracks = PlaylistDbMapper.fromTracksList(tracksList.toList())
         val updatedDurationSum = playlist.durationSum +
-                TrackMapper.convertStringToMillis(track.trackTimeString) * if (isAdding) 1 else -1
+                TrackMapper.convertStringToMillis(track.trackTimeString) * (if (isAdding) 1 else -1)
         playlistDatabase.daoPlaylist()
             .updateTracksInPlaylist(
                 playlist.playlistName,

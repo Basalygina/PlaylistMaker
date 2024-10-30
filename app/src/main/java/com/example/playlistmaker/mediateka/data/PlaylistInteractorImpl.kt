@@ -1,5 +1,6 @@
 package com.example.playlistmaker.mediateka.data
 
+import android.util.Log
 import com.example.playlistmaker.mediateka.domain.Playlist
 import com.example.playlistmaker.mediateka.domain.PlaylistInteractor
 import com.example.playlistmaker.mediateka.domain.PlaylistRepository
@@ -42,7 +43,7 @@ class PlaylistInteractorImpl(
         val trackIdsList =
             PlaylistDbMapper.toTracksList(playlistRepository.getPlaylistDetails(playlistName).tracks)
         trackIdsList.forEach { trackId ->
-            trackInPlaylistRepository.removeTrackFromDatabase(trackId)
+            trackInPlaylistRepository.removeTrackFromDatabase(trackId, playlistName)
         }
 
         playlistRepository.deletePlaylist(playlistName)
@@ -58,7 +59,7 @@ class PlaylistInteractorImpl(
         if (isAdding) {
             trackInPlaylistRepository.addTrackInDatabase(track)
         } else {
-            trackInPlaylistRepository.removeTrackFromDatabase(track.trackId)
+            trackInPlaylistRepository.removeTrackFromDatabase(track.trackId, playlistName)
         }
     }
 

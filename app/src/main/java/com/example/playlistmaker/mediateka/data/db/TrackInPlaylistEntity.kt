@@ -16,5 +16,4 @@ data class TrackInPlaylistEntity(
     val primaryGenreName: String, // Жанр
     val country: String, // Страна исполнителя
     val previewUrl: String // Отрывок трека
-
 )

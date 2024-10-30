@@ -29,8 +29,8 @@ interface DaoPlaylist {
     @Query("SELECT * FROM playlists WHERE playlistName = :playlistName")
     suspend fun getPlaylistDetails(playlistName: String): PlaylistEntity
 
-    @Query("SELECT tracks FROM playlists")
-    fun getAllTrackIdsInPlaylists(): Flow<List<String>>
+    @Query("SELECT tracks FROM playlists WHERE playlistName != :excludedPlaylistName")
+    fun getAllTrackIdsInPlaylists(excludedPlaylistName: String): Flow<List<String>>
 
 
 }

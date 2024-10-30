@@ -1,5 +1,6 @@
 package com.example.playlistmaker.mediateka.data
 
+import android.util.Log
 import com.example.playlistmaker.mediateka.data.PlaylistDbMapper.toTracksList
 import com.example.playlistmaker.mediateka.data.TrackDbMapper.toTrack
 import com.example.playlistmaker.mediateka.data.TrackDbMapper.toTrackInPlaylistEntity
@@ -25,12 +26,11 @@ class TrackInPlaylistRepositoryImpl(val playlistDatabase: PlaylistDatabase) :
         playlistDatabase.daoTrackInPlaylist().addTrackInDatabase(track.toTrackInPlaylistEntity())
     }
 
-    override suspend fun removeTrackFromDatabase(trackId: Int) = withContext(Dispatchers.IO) {
+    override suspend fun removeTrackFromDatabase(trackId: Int, playlistName: String) = withContext(Dispatchers.IO) {
         val allTrackIds = playlistDatabase.daoPlaylist()
-            .getAllTrackIdsInPlaylists()
+            .getAllTrackIdsInPlaylists(playlistName)
             .first()
             .flatMap { toTracksList(it) }
-
         if (trackId !in allTrackIds) {
             playlistDatabase.daoTrackInPlaylist().removeTrackFromDatabase(trackId)
         }

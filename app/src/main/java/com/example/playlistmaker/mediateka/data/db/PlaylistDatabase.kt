@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.playlistmaker.mediateka.data.PlaylistDbMapper
 
-@Database(entities = [PlaylistEntity::class, TrackEntity::class, TrackInPlaylistEntity::class], version = 1)
+@Database(entities = [PlaylistEntity::class, TrackEntity::class, TrackInPlaylistEntity::class], version = 2)
 @TypeConverters(PlaylistDbMapper::class)
 abstract class PlaylistDatabase : RoomDatabase() {
     abstract fun daoPlaylist(): DaoPlaylist

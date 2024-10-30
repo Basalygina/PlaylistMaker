@@ -59,7 +59,7 @@ class PlaylistDetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val currentActivity = activity
         if (currentActivity is RootActivity) {
-            currentActivity.binding.bottomNavigationView.isVisible = false
+            currentActivity.binding.bottomElementsGroup.isVisible = false
         }
         viewModel.setCurrentPlaylist(currentPlaylistName)
         viewModel.playlistState.observe(viewLifecycleOwner) { state ->
@@ -98,7 +98,6 @@ class PlaylistDetailsFragment : Fragment() {
             longClickListener = {
                 deleteTrackFromPlaylistDialog(currentPlaylistName!!, it)
 
-
             }
         )
 
@@ -113,20 +112,23 @@ class PlaylistDetailsFragment : Fragment() {
         bottomSheetMenu.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                bottomSheetTracks.isDraggable =
-                    newState != BottomSheetBehavior.STATE_EXPANDED
-                when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN -> {
-                        binding.overlay.visibility = View.GONE
+                if (_binding == null) return
+                    bottomSheetTracks.isDraggable =
+                        newState != BottomSheetBehavior.STATE_EXPANDED
+                    when (newState) {
+                        BottomSheetBehavior.STATE_HIDDEN -> {
+                            binding.overlay.visibility = View.GONE
+                        }
+
+                        else -> {
+                            binding.overlay.visibility = View.VISIBLE
+                        }
                     }
 
-                    else -> {
-                        binding.overlay.visibility = View.VISIBLE
-                    }
-                }
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                if (_binding == null) return
                 binding.overlay.alpha = slideOffset
             }
         })
@@ -145,6 +147,7 @@ class PlaylistDetailsFragment : Fragment() {
         }
 
         binding.menuShare.setOnClickListener {
+            bottomSheetMenu.state = BottomSheetBehavior.STATE_COLLAPSED
             viewModel.sharePlaylist(currentPlaylistName!!)
         }
 
@@ -215,13 +218,22 @@ class PlaylistDetailsFragment : Fragment() {
     }
 
     private fun setupPlaylistDetails(playlist: Playlist, tracks: List<Track>) {
-        binding.playlistName.text = playlist.playlistName
-        binding.playlistDescription.text = playlist.description
-        binding.playlistDuration.text =
-            SimpleDateFormat("m", Locale.getDefault()).format(playlist.durationSum) + " " +
-                    MediaTextFormatter.getMinutesDeclension(playlist.durationSum.toInt())
-        binding.tracksCount.text =
-            playlist.tracksCount.toString() + " " + MediaTextFormatter.getTrackDeclension(playlist.tracksCount)
+        val totalMinutes = (playlist.durationSum / 1000) / 60
+        with(binding){
+            if (tracks.size > 0) {
+                tracksNothingImage.isVisible = false
+                tracksNothingText.isVisible = false
+            } else {
+                tracksNothingImage.isVisible = true
+                tracksNothingText.isVisible = true
+            }
+            playlistName.text = playlist.playlistName
+            playlistDescription.text = playlist.description
+            playlistDuration.text =
+                "$totalMinutes " + MediaTextFormatter.getMinutesDeclension(totalMinutes.toInt())
+            tracksCount.text =
+                playlist.tracksCount.toString() + " " + MediaTextFormatter.getTrackDeclension(playlist.tracksCount)
+        }
 
         if (playlist.cover != null) {
             Glide.with(this)
@@ -271,11 +283,19 @@ class PlaylistDetailsFragment : Fragment() {
             .show()
     }
 
+    override fun onResume() {
+        super.onResume()
+        val currentActivity = activity
+        if (currentActivity is RootActivity) {
+            currentActivity.binding.bottomElementsGroup.isVisible = false
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         val currentActivity = activity
         if (currentActivity is RootActivity) {
-            currentActivity.binding.bottomNavigationView.isVisible = true
+            currentActivity.binding.bottomElementsGroup.isVisible = true
         }
         _binding = null
     }

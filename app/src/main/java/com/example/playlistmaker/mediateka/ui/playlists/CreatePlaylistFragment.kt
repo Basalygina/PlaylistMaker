@@ -57,7 +57,7 @@ open class CreatePlaylistFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val currentActivity = activity
         if (currentActivity is RootActivity) {
-            currentActivity.binding.bottomNavigationView.isVisible = false
+            currentActivity.binding.bottomElementsGroup.isVisible = false
         }
         binding.buttonCreate.isEnabled = false
 
@@ -154,7 +154,7 @@ open class CreatePlaylistFragment : Fragment() {
         super.onDestroyView()
         val currentActivity = activity
         if (currentActivity is RootActivity) {
-            currentActivity.binding.bottomNavigationView.isVisible = true
+            currentActivity.binding.bottomElementsGroup.isVisible = true
         }
         _binding = null
     }

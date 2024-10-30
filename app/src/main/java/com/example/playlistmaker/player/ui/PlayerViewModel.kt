@@ -84,7 +84,7 @@ class PlayerViewModel(
 
 
     fun pause() {
-        if (_playerState.value != PlayerScreenState.Paused) {
+        if (_playerState.value == PlayerScreenState.Playing) {
             playerInteractor.pausePlayer()
             _playerState.value = PlayerScreenState.Paused
         }

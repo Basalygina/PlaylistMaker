@@ -166,6 +166,29 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/drag_handle" />
 
+        <ImageView
+            android:id="@+id/tracks_nothing_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/nothing_found"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tracks_nothing_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/ys_display_regular"
+            android:lineHeight="@dimen/small_text_size"
+            android:text="@string/playlist_is_empty"
+            android:textColor="@color/primary_text_color"
+            android:textSize="@dimen/playlist_text_size"
+            android:visibility="gone" />
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/tracks_recycler"
             android:layout_width="match_parent"

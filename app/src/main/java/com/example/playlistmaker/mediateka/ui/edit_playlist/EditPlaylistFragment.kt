@@ -56,12 +56,14 @@ class EditPlaylistFragment : CreatePlaylistFragment() {
     private fun setupPlaylistDetails(playlist: Playlist) {
         val currentActivity = activity
         if (currentActivity is RootActivity) {
-            currentActivity.binding.bottomNavigationView.isVisible = false
+            currentActivity.binding.bottomElementsGroup.isVisible = false
         }
-        binding.createToolbar.title = getString(R.string.edit)
-        binding.buttonCreate.text = getString(R.string.save)
-        binding.playlistName.setText(playlist.playlistName)
-        binding.playlistDescription.setText(playlist.description)
+        with(binding) {
+            createToolbar.title = getString(R.string.edit)
+            buttonCreate.text = getString(R.string.save)
+            playlistName.setText(playlist.playlistName)
+            playlistDescription.setText(playlist.description)
+        }
         currentPlaylistCover = playlist.cover
 
         if (playlist.cover != null) {

@@ -1,5 +1,7 @@
 package com.example.playlistmaker.mediateka.ui
 
+import android.util.Log
+
 object MediaTextFormatter {
     fun getTrackDeclension(tracksCount: Int): String {
         return when {
@@ -9,9 +11,7 @@ object MediaTextFormatter {
         }
     }
 
-    fun getMinutesDeclension(duration: Int): String {
-        val minutes = duration / 60 / 1000
-
+    fun getMinutesDeclension(minutes: Int): String {
         return when {
             minutes % 10 == 1 && minutes % 100 != 11 -> "минута"
             minutes % 10 in 2..4 && minutes % 100 !in 12..14 -> "минуты"
