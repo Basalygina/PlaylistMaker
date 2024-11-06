@@ -6,14 +6,14 @@ import com.example.playlistmaker.mediateka.data.FileManager
 import com.example.playlistmaker.mediateka.domain.Playlist
 import com.example.playlistmaker.mediateka.domain.PlaylistInteractor
 
-class CreatePlaylistViewModel(
+open class CreatePlaylistViewModel(
     private val fileManager: FileManager,
     private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
-    fun saveCover(uri: Uri) = uri?.let {
-        fileManager.saveImageToAppStorage(it)
-    }
+    fun saveCover(uri: Uri) =
+        fileManager.saveImageToAppStorage(uri)
+
 
     suspend fun createPlaylist(name: String, description: String?, coverImagePath: String?) =
         playlistInteractor.createPlaylist(name, description, coverImagePath)

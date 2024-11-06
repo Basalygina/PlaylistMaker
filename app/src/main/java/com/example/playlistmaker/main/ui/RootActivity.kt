@@ -1,6 +1,9 @@
 package com.example.playlistmaker.main.ui
 
 import android.os.Bundle
+import android.view.Gravity
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit

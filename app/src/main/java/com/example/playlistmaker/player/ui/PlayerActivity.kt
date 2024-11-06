@@ -156,28 +156,26 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun onLoadingTrackDetails() {
-        binding.buttonPlay.isVisible = false
-        binding.buttonFavorite.isVisible = false
-        binding.buttonAddToPlaylist.isVisible = false
+        binding.playerElementsGroup.isVisible = false
     }
 
     private fun preparePlayerUi() {
         binding.playedTime.setText(R.string.timer_start_time)
         binding.buttonPlay.setImageResource(R.drawable.ic_play)
-        binding.buttonPlay.isVisible = true
-        binding.buttonFavorite.isVisible = true
-        binding.buttonAddToPlaylist.isVisible = true
+        binding.playerElementsGroup.isVisible = true
     }
 
     private fun setupTrackDetails(track: Track) {
         currentTrack = track
-        binding.trackName.text = track.trackName
-        binding.artistName.text = track.artistName
-        binding.trackTimeData.text = track.trackTimeString
-        binding.collectionData.text = track.collectionName
-        binding.yearData.text = track.releaseDate.substring(0, 4)
-        binding.genreData.text = track.primaryGenreName
-        binding.countryData.text = track.country
+        with(binding) {
+            trackName.text = track.trackName
+            artistName.text = track.artistName
+            trackTimeData.text = track.trackTimeString
+            collectionData.text = track.collectionName
+            yearData.text = track.releaseDate.substring(0, 4)
+            genreData.text = track.primaryGenreName
+            countryData.text = track.country
+        }
         if (track.isFavorite) {
             binding.buttonFavorite.setImageResource(R.drawable.ic_fav_selected)
         } else {

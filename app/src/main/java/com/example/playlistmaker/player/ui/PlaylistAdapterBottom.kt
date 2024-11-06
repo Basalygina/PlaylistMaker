@@ -5,12 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.mediateka.domain.Playlist
-import com.example.playlistmaker.mediateka.ui.playlists.PlaylistViewHolder
-import com.example.playlistmaker.search.domain.Track
 
 class PlaylistAdapterBottom(
     private val playlists: MutableList<Playlist>,
-    private val clickListener: PlaylistClickListener
+    private val clickListener: AddToPlaylistClickListener
 ) : RecyclerView.Adapter<PlaylistViewHolderBottom>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolderBottom {
         val view =
@@ -24,7 +22,7 @@ class PlaylistAdapterBottom(
         val playlist = playlists[position]
         holder.bind(playlist)
         holder.itemView.setOnClickListener {
-            clickListener.onPlaylistClick(playlist)
+            clickListener.onAddToPlaylistClick(playlist)
         }
     }
 
@@ -34,7 +32,7 @@ class PlaylistAdapterBottom(
         notifyDataSetChanged()
     }
 
-    fun interface PlaylistClickListener {
-        fun onPlaylistClick(playlist: Playlist)
+    fun interface AddToPlaylistClickListener {
+        fun onAddToPlaylistClick(playlist: Playlist)
     }
 }

@@ -64,7 +64,7 @@
         android:id="@+id/share_app"
         style="@style/SettingsScreenButton"
         android:drawableEnd="@drawable/ic_share"
-        android:text="@string/share"
+        android:text="@string/share_app"
         app:layout_constraintTop_toBottomOf="@+id/theme_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

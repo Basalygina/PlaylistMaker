@@ -72,12 +72,12 @@ class SearchFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         }
 
-        adapterSearchHistory = TrackAdapter(mutableListOf()) {
+        adapterSearchHistory = TrackAdapter(mutableListOf(), {
             if (clickDebounce()) selectTrack(it)
-        }
-        adapter = TrackAdapter(mutableListOf()) {
+        })
+        adapter = TrackAdapter(mutableListOf(), {
             if (clickDebounce()) selectTrack(it)
-        }
+        })
 
         binding.searchEditText.addTextChangedListener(textWatcher)
         binding.searchEditText.setOnFocusChangeListener { _, hasFocus ->

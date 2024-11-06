@@ -11,12 +11,13 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
 import com.example.playlistmaker.mediateka.domain.Playlist
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.example.playlistmaker.mediateka.domain.Playlist.Companion.ARG_PLAYLIST_NAME
 
 class PlaylistsFragment : Fragment() {
     private val viewModel: PlaylistsViewModel by viewModel()
     private var _binding: FragmentPlaylistsBinding? = null
     private val binding get() = _binding!!
-    private var adapter = PlaylistAdapter(mutableListOf())
+    private lateinit var adapter: PlaylistAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,14 +34,18 @@ class PlaylistsFragment : Fragment() {
         viewModel.playlistScreenState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 PlaylistsScreenState.Empty -> showEmpty()
-                is PlaylistsScreenState.NavigateToPlaylistDetails -> TODO()
                 is PlaylistsScreenState.Playlists -> showPlaylists(state.playlists)
             }
         }
         binding.newPlaylist.setOnClickListener {
             findNavController().navigate(R.id.createPlaylistFragment)
         }
-
+        adapter = PlaylistAdapter(mutableListOf()) {
+            val bundle = Bundle().apply {
+                putString(ARG_PLAYLIST_NAME, it.playlistName)
+            }
+            findNavController().navigate(R.id.playlistDetailsFragment, bundle)
+        }
         binding.playlistRecycler.adapter = adapter
     }
 
@@ -65,6 +70,7 @@ class PlaylistsFragment : Fragment() {
 
     companion object {
         fun newInstance(): Fragment = PlaylistsFragment()
+
     }
 
 }

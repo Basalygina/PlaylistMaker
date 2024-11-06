@@ -12,11 +12,11 @@ import kotlinx.coroutines.flow.map
 
 class FavTracksRepositoryImpl(val playlistDatabase: PlaylistDatabase) : FavTracksRepository {
     override suspend fun addToFav(track: Track) {
-        playlistDatabase.favDao().addToFav(track.toTrackEntity())
+        playlistDatabase.daoFav().addToFav(track.toTrackEntity())
     }
 
     override suspend fun removeFromFav(track: Track) {
-        playlistDatabase.favDao().removeFromFav(track.trackId)
+        playlistDatabase.daoFav().removeFromFav(track.trackId)
     }
 
     override suspend fun checkIfFav(track: Track): Boolean {
@@ -27,7 +27,7 @@ class FavTracksRepositoryImpl(val playlistDatabase: PlaylistDatabase) : FavTrack
 
 
     override fun getAllFavTracks(): Flow<List<Track>> {
-        return playlistDatabase.favDao().getAllFavTracks()
+        return playlistDatabase.daoFav().getAllFavTracks()
             .map { trackEntities ->
                 trackEntities.map { it.toTrack() }
             }

@@ -17,7 +17,7 @@
     <color name="track_tint">#9FBBF3</color>
     <color name="icon_tint">@color/color_white</color>
     <color name="search_screen_header_color">@color/color_white</color>
-    <color name="search_tint">@color/color_white</color>
+    <color name="primary_tint_light">@color/color_white</color>
     <color name="search_icon_tint">@color/color_black</color>
     <color name="search_screen_text_color">@color/color_black</color>
     <color name="search_track_title">@color/color_white</color>

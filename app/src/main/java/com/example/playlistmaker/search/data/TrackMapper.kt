@@ -35,7 +35,7 @@ object TrackMapper {
         )
     }
 
-    private fun convertStringToMillis(time: String): Int {
+    fun convertStringToMillis(time: String): Int {
         val parts = time.split(":")
         if (parts.size != 2) {
             throw IllegalArgumentException("Invalid time format, expected MM:SS")
@@ -45,7 +45,7 @@ object TrackMapper {
         return (minutes * 60 + seconds) * 1000
     }
 
-    private fun convertMillisToString(millis: Int): String {
+    fun convertMillisToString(millis: Int): String {
         val minutes = (millis / 1000) / 60
         val seconds = (millis / 1000) % 60
         return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)

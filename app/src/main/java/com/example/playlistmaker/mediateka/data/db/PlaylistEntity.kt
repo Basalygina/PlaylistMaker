@@ -10,6 +10,7 @@ data class PlaylistEntity(
     val cover: String?, // Путь к файлу обложки
     val tracks: String = "", // Список идентификаторов треков
     val tracksCount: Int = 0, // Количество треков
+    val durationSum: Long = 0L, // Общая длительность треков в миллисекундах
     @PrimaryKey(autoGenerate = true)
     val id: Int? = null
 

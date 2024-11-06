@@ -1,12 +1,18 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.PlaylistMaker" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="background">@color/primary_background_color</item>
+        <item name="colorPrimary">@color/color_blue</item>
+        <item name="colorOnPrimary">@color/primary_background_color</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/color_white</item>
+        <item name="colorSecondaryVariant">@color/color_light_grey</item>
+        <item name="colorOnSecondary">@color/color_grey</item>
+        <item name="colorAccent">@color/color_blue</item>
     </style>
 
     <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker">
-        <item name="colorControlNormal">@color/color_red</item>
+        <item name="colorControlNormal">@color/color_blue</item>
         <item name="colorControlActivated">@color/color_blue</item>
     </style>
 </resources>

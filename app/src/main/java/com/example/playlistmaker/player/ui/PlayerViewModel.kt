@@ -84,7 +84,7 @@ class PlayerViewModel(
 
 
     fun pause() {
-        if (_playerState.value != PlayerScreenState.Paused) {
+        if (_playerState.value == PlayerScreenState.Playing) {
             playerInteractor.pausePlayer()
             _playerState.value = PlayerScreenState.Paused
         }
@@ -135,7 +135,7 @@ class PlayerViewModel(
             return false
         } else {
             viewModelScope.launch {
-                playlistInteractor.updatePlaylist(playlist, track)
+                playlistInteractor.updateTracksInPlaylist(playlist.playlistName, track, isAdding = true)
             }
             return true
         }
